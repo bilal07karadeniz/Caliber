@@ -7,16 +7,16 @@ interface BadgeProps {
 }
 
 const variants = {
-  success: 'bg-green-100 text-green-800',
-  warning: 'bg-yellow-100 text-yellow-800',
-  error: 'bg-red-100 text-red-800',
-  info: 'bg-blue-100 text-blue-800',
-  neutral: 'bg-gray-100 text-gray-800',
+  success: 'border-verdant-500 text-verdant-700',
+  warning: 'border-saffron-500 text-saffron-700',
+  error: 'border-signal-low text-signal-low',
+  info: 'border-ink-400 text-ink-600',
+  neutral: 'border-ink-200 text-ink-500',
 };
 
 export default function Badge({ children, variant = 'neutral', className }: BadgeProps) {
   return (
-    <span className={clsx('inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium', variants[variant], className)}>
+    <span className={clsx('inline-flex items-center px-2 py-0.5 rounded-sm border font-mono text-xs', variants[variant], className)}>
       {children}
     </span>
   );

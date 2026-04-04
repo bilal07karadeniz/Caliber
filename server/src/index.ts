@@ -20,7 +20,7 @@ app.use(morgan('dev'));
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static('uploads'));
+app.use('/uploads', express.static(config.uploadDir));
 app.use(generalLimiter);
 
 // Health check

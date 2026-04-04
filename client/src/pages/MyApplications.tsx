@@ -47,7 +47,7 @@ export default function MyApplications() {
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Applications</h1>
+        <h1 className="font-heading text-2xl font-bold text-ink-900">My Applications</h1>
         <Select value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(1); }}
           options={[{ value: '', label: 'All Status' }, { value: 'PENDING', label: 'Pending' }, { value: 'REVIEWED', label: 'Reviewed' }, { value: 'SHORTLISTED', label: 'Shortlisted' }, { value: 'ACCEPTED', label: 'Accepted' }, { value: 'REJECTED', label: 'Rejected' }]}
           className="w-40" />
@@ -63,9 +63,9 @@ export default function MyApplications() {
                 <Card key={app.id}>
                   <div className="flex flex-col sm:flex-row justify-between gap-3">
                     <div>
-                      <Link to={`/jobs/${app.jobId}`} className="font-semibold text-gray-900 hover:text-primary-600">{app.job?.title}</Link>
-                      <p className="text-sm text-gray-500">{app.job?.employer?.companyProfile?.companyName} · {app.job?.location}</p>
-                      <p className="text-xs text-gray-400 mt-1">Applied {new Date(app.appliedAt).toLocaleDateString()}</p>
+                      <Link to={`/jobs/${app.jobId}`} className="font-heading font-semibold text-ink-900 hover:text-verdant-600 transition-colors">{app.job?.title}</Link>
+                      <p className="text-sm text-ink-500">{app.job?.employer?.companyProfile?.companyName} · {app.job?.location}</p>
+                      <p className="text-xs text-ink-400 mt-1">Applied {new Date(app.appliedAt).toLocaleDateString()}</p>
                     </div>
                     <div className="flex items-center gap-3">
                       <Badge variant={statusVariants[app.status]}>{app.status}</Badge>

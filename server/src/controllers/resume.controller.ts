@@ -2,6 +2,7 @@ import { Response } from 'express';
 import path from 'path';
 import fs from 'fs';
 import prisma from '../config/database';
+import { config } from '../config';
 import { AuthenticatedRequest } from '../types';
 import { aiEngineService } from '../services/aiEngine.service';
 
@@ -91,7 +92,7 @@ export const deleteResume = async (req: AuthenticatedRequest, res: Response) => 
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
     // Delete file from disk
-    const fullPath = path.resolve('.' + resume.filePath);
+    const fullPath = path.resolve(config.uploadDir, resume.filePath.replace('/uploads/', ''));
     if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
 
     await prisma.resume.delete({ where: { id: req.params.id } });

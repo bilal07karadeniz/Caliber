@@ -16,16 +16,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={disabled || isLoading}
         className={twMerge(
           clsx(
-            'inline-flex items-center justify-center font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed',
+            'inline-flex items-center justify-center font-heading font-semibold rounded transition-colors focus:outline-none focus:ring-2 focus:ring-inset disabled:opacity-50 disabled:cursor-not-allowed',
             {
-              'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500': variant === 'primary',
-              'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500': variant === 'secondary',
-              'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500': variant === 'outline',
-              'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500': variant === 'danger',
-              'text-gray-700 hover:bg-gray-100 focus:ring-gray-500': variant === 'ghost',
-              'px-3 py-1.5 text-sm': size === 'sm',
+              'bg-verdant-500 text-white hover:bg-verdant-600 focus:ring-verdant-300': variant === 'primary',
+              'bg-ink-100 text-ink-800 hover:bg-ink-200 border border-ink-300 focus:ring-ink-400': variant === 'secondary',
+              'border-2 border-ink-900 text-ink-900 hover:bg-ink-900 hover:text-white focus:ring-ink-400': variant === 'outline',
+              'bg-signal-low text-white hover:bg-signal-low/90 focus:ring-signal-low/50': variant === 'danger',
+              'text-ink-600 hover:text-ink-900 hover:underline underline-offset-4 focus:ring-ink-400': variant === 'ghost',
+              'px-2.5 py-1 text-xs': size === 'sm',
               'px-4 py-2 text-sm': size === 'md',
-              'px-6 py-3 text-base': size === 'lg',
+              'px-5 py-2.5 text-sm uppercase tracking-wide': size === 'lg',
             }
           ),
           className
@@ -33,10 +33,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         {...props}
       >
         {isLoading && (
-          <svg className="animate-spin -ml-1 mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
+          <div className="mr-2 h-3 w-3 animate-pulse-line rounded-full bg-current" />
         )}
         {children}
       </button>

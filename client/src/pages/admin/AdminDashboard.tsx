@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Users, Briefcase, FileText, Sparkles, CheckCircle, XCircle } from 'lucide-react';
+import { CheckCircle, XCircle } from 'lucide-react';
 import DashboardLayout from '../../layouts/DashboardLayout';
 import Card from '../../components/ui/Card';
 import Spinner from '../../components/ui/Spinner';
@@ -28,68 +28,51 @@ export default function AdminDashboard() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Admin Dashboard</h1>
+      <h1 className="font-heading text-2xl font-bold text-ink-900 mb-6">Admin Dashboard</h1>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-blue-100 rounded-lg"><Users className="w-5 h-5 text-blue-600" /></div>
-            <div>
-              <p className="text-2xl font-bold">{stats?.users?.total || 0}</p>
-              <p className="text-sm text-gray-500">Total Users</p>
-            </div>
+      {/* Data wall stats */}
+      <div className="border border-ink-200 rounded-md bg-surface-raised mb-6">
+        <div className="data-wall">
+          <div>
+            <p className="label mb-1">Total Users</p>
+            <p className="data-value">{stats?.users?.total || 0}</p>
           </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-green-100 rounded-lg"><Briefcase className="w-5 h-5 text-green-600" /></div>
-            <div>
-              <p className="text-2xl font-bold">{stats?.jobs?.active || 0}</p>
-              <p className="text-sm text-gray-500">Active Jobs</p>
-            </div>
+          <div>
+            <p className="label mb-1">Active Jobs</p>
+            <p className="data-value">{stats?.jobs?.active || 0}</p>
           </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 rounded-lg"><FileText className="w-5 h-5 text-purple-600" /></div>
-            <div>
-              <p className="text-2xl font-bold">{stats?.applications?.total || 0}</p>
-              <p className="text-sm text-gray-500">Applications</p>
-            </div>
+          <div>
+            <p className="label mb-1">Applications</p>
+            <p className="data-value">{stats?.applications?.total || 0}</p>
           </div>
-        </Card>
-        <Card>
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-orange-100 rounded-lg"><Sparkles className="w-5 h-5 text-orange-600" /></div>
-            <div>
-              <p className="text-2xl font-bold">{Math.round(stats?.aiMetrics?.averageMatchScore || 0)}%</p>
-              <p className="text-sm text-gray-500">Avg Match Score</p>
-            </div>
+          <div>
+            <p className="label mb-1">Avg Match Score</p>
+            <p className="data-value">{Math.round(stats?.aiMetrics?.averageMatchScore || 0)}%</p>
           </div>
-        </Card>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card header={<h3 className="font-semibold">System Health</h3>}>
+        <Card header={<h3 className="font-heading font-semibold text-ink-900">System Health</h3>}>
           <div className="space-y-3">
             {Object.entries(health || {}).map(([service, status]) => (
               <div key={service} className="flex items-center justify-between">
-                <span className="text-sm capitalize">{service}</span>
+                <span className="text-sm capitalize text-ink-700">{service}</span>
                 <div className="flex items-center gap-1">
-                  {status === 'ok' ? <CheckCircle className="w-4 h-4 text-green-500" /> : <XCircle className="w-4 h-4 text-red-500" />}
-                  <span className={`text-sm ${status === 'ok' ? 'text-green-600' : 'text-red-600'}`}>{String(status)}</span>
+                  {status === 'ok' ? <CheckCircle className="w-4 h-4 text-signal-high" /> : <XCircle className="w-4 h-4 text-signal-low" />}
+                  <span className={`text-sm font-mono ${status === 'ok' ? 'text-signal-high' : 'text-signal-low'}`}>{String(status)}</span>
                 </div>
               </div>
             ))}
           </div>
         </Card>
 
-        <Card header={<h3 className="font-semibold">User Breakdown</h3>}>
+        <Card header={<h3 className="font-heading font-semibold text-ink-900">User Breakdown</h3>}>
           <div className="space-y-3">
-            <div className="flex justify-between"><span className="text-sm text-gray-500">Job Seekers</span><span className="font-medium">{stats?.users?.jobSeekers || 0}</span></div>
-            <div className="flex justify-between"><span className="text-sm text-gray-500">Employers</span><span className="font-medium">{stats?.users?.employers || 0}</span></div>
-            <div className="flex justify-between"><span className="text-sm text-gray-500">Admins</span><span className="font-medium">{stats?.users?.admins || 0}</span></div>
-            <div className="flex justify-between border-t pt-2"><span className="text-sm text-gray-500">New this week</span><span className="font-medium text-green-600">+{stats?.growth?.newUsersThisWeek || 0}</span></div>
+            <div className="flex justify-between"><span className="text-sm text-ink-500">Job Seekers</span><span className="font-mono tabular-nums font-medium text-ink-900">{stats?.users?.jobSeekers || 0}</span></div>
+            <div className="flex justify-between"><span className="text-sm text-ink-500">Employers</span><span className="font-mono tabular-nums font-medium text-ink-900">{stats?.users?.employers || 0}</span></div>
+            <div className="flex justify-between"><span className="text-sm text-ink-500">Admins</span><span className="font-mono tabular-nums font-medium text-ink-900">{stats?.users?.admins || 0}</span></div>
+            <div className="flex justify-between border-t border-ink-200 pt-2"><span className="text-sm text-ink-500">New this week</span><span className="font-mono tabular-nums font-medium text-verdant-600">+{stats?.growth?.newUsersThisWeek || 0}</span></div>
           </div>
         </Card>
       </div>

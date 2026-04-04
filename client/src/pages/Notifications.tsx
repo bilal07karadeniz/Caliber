@@ -51,7 +51,7 @@ export default function Notifications() {
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Notifications</h1>
+        <h1 className="font-heading text-2xl font-bold text-ink-900">Notifications</h1>
         {notifications.some((n) => !n.isRead) && (
           <Button variant="ghost" size="sm" onClick={handleMarkAllRead}><Check className="w-4 h-4 mr-1" /> Mark all read</Button>
         )}
@@ -62,25 +62,25 @@ export default function Notifications() {
       ) : (
         <div className="space-y-2">
           {notifications.map((n) => (
-            <Card key={n.id} className={!n.isRead ? 'border-l-4 border-l-primary-500' : ''}>
+            <Card key={n.id} className={!n.isRead ? 'border-l-4 border-l-verdant-500' : ''}>
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     <Badge variant={typeIcons[n.type] as any || 'neutral'}>{n.type.replace('_', ' ')}</Badge>
-                    {!n.isRead && <span className="w-2 h-2 bg-primary-500 rounded-full" />}
+                    {!n.isRead && <span className="w-2 h-2 bg-verdant-500 rounded-full" />}
                   </div>
-                  <p className="font-medium text-sm">{n.title}</p>
-                  <p className="text-sm text-gray-500">{n.message}</p>
-                  <p className="text-xs text-gray-400 mt-1">{new Date(n.createdAt).toLocaleString()}</p>
+                  <p className="font-medium text-sm text-ink-900">{n.title}</p>
+                  <p className="text-sm text-ink-500 font-body">{n.message}</p>
+                  <p className="text-xs text-ink-400 mt-1 font-mono tabular-nums">{new Date(n.createdAt).toLocaleString()}</p>
                 </div>
                 <div className="flex gap-1">
                   {!n.isRead && (
-                    <button onClick={() => handleMarkRead(n.id)} className="p-1 hover:bg-gray-100 rounded" title="Mark read">
-                      <Check className="w-4 h-4 text-gray-400" />
+                    <button onClick={() => handleMarkRead(n.id)} className="p-1 hover:bg-surface-sunken rounded-md transition-colors" title="Mark read">
+                      <Check className="w-4 h-4 text-ink-400" />
                     </button>
                   )}
-                  <button onClick={() => handleDelete(n.id)} className="p-1 hover:bg-gray-100 rounded" title="Delete">
-                    <Trash2 className="w-4 h-4 text-gray-400" />
+                  <button onClick={() => handleDelete(n.id)} className="p-1 hover:bg-surface-sunken rounded-md transition-colors" title="Delete">
+                    <Trash2 className="w-4 h-4 text-ink-400" />
                   </button>
                 </div>
               </div>

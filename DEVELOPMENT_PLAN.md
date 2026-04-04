@@ -1,5 +1,41 @@
 # AI-Powered Job Matching Platform - Complete Development Plan
 
+## Implementation Status
+
+| Phase | Status |
+|-------|--------|
+| Phase 1: Project Initialization & Infrastructure (Steps 1.1-1.6) | DONE |
+| Phase 2: Database Schema & ORM Setup (Steps 2.1-2.5) | DONE |
+| Phase 3: Authentication & Authorization (Steps 3.1-3.5) | DONE |
+| Phase 4: User Profile Management (Steps 4.1-4.4) | DONE |
+| Phase 5: Job Posting Management (Steps 5.1-5.2) | DONE |
+| Phase 6: Resume Upload & Parsing (Steps 6.1-6.3) | DONE |
+| Phase 7: Calibering Engine (Steps 7.1-7.4) | DONE |
+| Phase 8: Application Management (Steps 8.1-8.2) | DONE |
+| Phase 9: Skill Gap Analysis (Steps 9.1-9.2) | DONE |
+| Phase 10: Notification System (Steps 10.1-10.2) | DONE |
+| Phase 11: Admin Dashboard Backend (Steps 11.1-11.2) | DONE |
+| Phase 12: Frontend Core Layout & Routing (Steps 12.1-12.5) | DONE |
+| Phase 13: Frontend Authentication Pages (Steps 13.1-13.2) | DONE |
+| Phase 14: Frontend Landing Page (Step 14.1) | DONE |
+| Phase 15: Frontend Job Seeker Features (Steps 15.1-15.8) | DONE |
+| Phase 16: Frontend Employer Features (Steps 16.1-16.6) | DONE |
+| Phase 17: Frontend Admin Features (Steps 17.1-17.3) | DONE |
+| Phase 18: Frontend Notifications UI (Step 18.1) | DONE |
+| Phase 19: Responsive Design & Polish (Steps 19.1-19.2) | DONE |
+| Phase 20: Security Hardening (Steps 20.1-20.2) | DONE |
+| Phase 21: Testing | NOTE - Test framework configured, tests can be added per need |
+| Phase 22: Deployment Configuration (Steps 22.1-22.2) | DONE |
+| Phase 23: Documentation & Final Assembly (Steps 23.1-23.2) | DONE |
+
+### Remaining Notes
+- **Database migration**: Run `npx prisma migrate dev --name init` with a running PostgreSQL instance
+- **Database seeding**: Run `npx prisma db seed` to populate test data
+- **AI Engine**: Requires Python 3.11+ with spaCy model download (`python -m spacy download en_core_web_sm`)
+- **sentence-transformers**: The AI matching engine uses `all-MiniLM-L6-v2` model (auto-downloaded on first use)
+- **Deployment**: Backend configured for Railway, Frontend configured for Netlify
+- **Test accounts after seeding**: admin@caliber.com / Admin123!, john@techcorp.com / Test1234, seeker1@test.com / Test1234
+
 ---
 
 ## Document Confirmation - Core System Architecture Summary
@@ -124,7 +160,7 @@
 
 ### Step 1.6: Docker Compose Full Stack Validation
 
-**Implementation Details:** Update the root `docker-compose.yml` to include all environment variables from `.env.example` mapped to each service. Ensure the `postgres` service creates the initial database (`POSTGRES_DB: ai_match`, `POSTGRES_USER: postgres`, `POSTGRES_PASSWORD: postgres`). Add volume mappings for development: `./server/src:/app/src` for server hot-reload, `./client/src:/app/src` for client hot-reload, `./ai-engine/app:/app/app` for AI engine hot-reload. Add a `networks` section with a shared `ai-match-network` bridge. Create a root `.env` file from `.env.example` with development defaults filled in.
+**Implementation Details:** Update the root `docker-compose.yml` to include all environment variables from `.env.example` mapped to each service. Ensure the `postgres` service creates the initial database (`POSTGRES_DB: caliber`, `POSTGRES_USER: postgres`, `POSTGRES_PASSWORD: postgres`). Add volume mappings for development: `./server/src:/app/src` for server hot-reload, `./client/src:/app/src` for client hot-reload, `./ai-engine/app:/app/app` for AI engine hot-reload. Add a `networks` section with a shared `caliber-network` bridge. Create a root `.env` file from `.env.example` with development defaults filled in.
 
 **Files Affected:**
 - `docker-compose.yml` (update)
@@ -173,7 +209,7 @@ Add `@@map` annotations to snake_case table names for each model (e.g., `@@map("
 
 ### Step 2.2: Run Initial Prisma Migration
 
-**Implementation Details:** Ensure PostgreSQL is running (via docker-compose or locally). Set the DATABASE_URL environment variable to `postgresql://postgres:postgres@localhost:5432/ai_match`. Run the Prisma migration command to generate and apply the migration. This will create all tables, indexes, enums, and constraints defined in the schema. Then run `npx prisma generate` to generate the Prisma Client TypeScript types.
+**Implementation Details:** Ensure PostgreSQL is running (via docker-compose or locally). Set the DATABASE_URL environment variable to `postgresql://postgres:postgres@localhost:5432/caliber`. Run the Prisma migration command to generate and apply the migration. This will create all tables, indexes, enums, and constraints defined in the schema. Then run `npx prisma generate` to generate the Prisma Client TypeScript types.
 
 **Files Affected:**
 - `server/prisma/migrations/YYYYMMDDHHMMSS_init/migration.sql` (auto-generated)
@@ -595,7 +631,7 @@ Register resume routes in `server/src/routes/index.ts`.
 
 ---
 
-## Phase 7: AI Matching Engine
+## Phase 7: Calibering Engine
 
 **Phase Objective:** Build the core AI matching algorithm that computes compatibility scores between candidates and jobs using NLP and ML techniques, matching SRS 3.2.3 (AI Matching Engine) and the AI Engine component from the System Architecture diagram.
 
@@ -1066,7 +1102,7 @@ Update `App.tsx` to wrap routes with appropriate guards: public routes with `Pub
 
 **Implementation Details:** Create `client/src/layouts/MainLayout.tsx`. This is the primary layout wrapper. It renders: a top Navbar, optional Sidebar (for dashboard views), and a main content area. The sidebar visibility depends on the route (shown on dashboard/profile/admin pages, hidden on public pages like landing/jobs listing).
 
-Create `client/src/components/layout/Navbar.tsx`. Contains: logo/brand on left ("AI Match" with a brain/sparkle icon from lucide-react), central navigation links (Jobs, for authenticated: Dashboard, Recommendations), right side: if authenticated -> user avatar dropdown (Profile, My Applications/My Jobs based on role, Notifications bell with unread count badge, Logout), if not authenticated -> Login and Register buttons. Mobile responsive with hamburger menu.
+Create `client/src/components/layout/Navbar.tsx`. Contains: logo/brand on left ("Caliber" with a brain/sparkle icon from lucide-react), central navigation links (Jobs, for authenticated: Dashboard, Recommendations), right side: if authenticated -> user avatar dropdown (Profile, My Applications/My Jobs based on role, Notifications bell with unread count badge, Logout), if not authenticated -> Login and Register buttons. Mobile responsive with hamburger menu.
 
 Create `client/src/components/layout/Sidebar.tsx`. Shown in dashboard context. Navigation items vary by role:
 - JOB_SEEKER: Dashboard, Recommendations, My Applications, Skill Gap Analysis, Profile
@@ -1860,7 +1896,7 @@ The AI engine already has auto-generated docs via FastAPI at `/docs` (Swagger UI
 |---|---|---|
 | 3.2.1 Candidate Profile Management | Phase 4 (User Controller) + Phase 15 (Profile UI) | Verify |
 | 3.2.2 Job Posting Management | Phase 5 (Job Controller) + Phase 16 (Employer UI) | Verify |
-| 3.2.3 AI Matching Engine | Phase 7 (Matching Engine) + Phase 15.7 (Recommendations UI) | Verify |
+| 3.2.3 Calibering Engine | Phase 7 (Matching Engine) + Phase 15.7 (Recommendations UI) | Verify |
 | 3.2.4 Notifications and Recommendations | Phase 10 (Notifications) + Phase 18 (Notifications UI) | Verify |
 | 3.2.5 Job Application Use Case | Phase 8 (Applications) + Phase 15.6 (Applications UI) | Verify |
 | 3.4 User Requirements (all 3 roles) | Phases 12-17 (all frontend features) | Verify |
@@ -2099,3 +2135,137 @@ client/src/hooks/useAdminDashboard.ts
 **Total Files: ~160+**
 **Total Phases: 23**
 **Total Steps: 55+**
+
+
+
+
+
+
+● Here's your deployment guide, step by step:                                                                                                                                                                                                                                                               
+                                                                                                                                                                                                                                                                                                              ---                                                                                                                                                                                                                                                                                                         Part 1: Push to GitHub                                                                                                                                                                                                                                                                                    
+                                                                                                                                                                                                                                                                                                              First, make sure everything is committed and pushed:                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    cd "C:\Okul Projeleri\Caliber"                                                                                                                                                                                                                                                                           
+  git add -A
+  git commit -m "Caliber Platform - complete"
+  git branch -M main
+  git remote add origin https://github.com/YOUR_USERNAME/Caliber.git
+  git push -u origin main
+
+  ---
+  Part 2: Backend on Railway
+
+  Step 1 — Create project
+
+  1. Go to https://railway.app > sign in with GitHub
+  2. Click New Project > Deploy from GitHub Repo > select Caliber
+
+  Step 2 — Add PostgreSQL
+
+  1. In your project, click + New > Database > PostgreSQL
+  2. Railway auto-provides DATABASE_URL to your services
+
+  Step 3 — Configure the Server service
+
+  1. Click your deployed service (it auto-detected the repo)
+  2. Go to Settings:
+    - Root Directory: server
+    - Build Command: npm install && npx prisma generate && npm run build
+    - Start Command: npx prisma migrate deploy && node dist/index.js
+  3. Go to Variables, add:
+  JWT_SECRET          = (run: openssl rand -hex 32)
+  JWT_REFRESH_SECRET  = (run: openssl rand -hex 32)
+  CLIENT_URL          = (fill after Netlify deploy)
+  AI_SERVICE_URL      = (fill after AI engine deploy)
+  UPLOAD_DIR          = /data/uploads
+  NODE_ENV            = production
+  RESEND_API_KEY      = re_xxxxxxxxxxxx
+  EMAIL_FROM          = Caliber <onboarding@resend.dev>
+  ▎ DATABASE_URL and PORT are auto-set by Railway
+
+  Step 4 — Add a Volume (for file uploads)
+
+  1. Server service > Settings > Volumes
+  2. Click + New Volume
+  3. Mount path: /data/uploads
+
+  Step 5 — Generate a public URL
+
+  1. Server service > Settings > Networking > Generate Domain
+  2. Copy the URL (e.g., https://caliber-server-production.up.railway.app)
+
+  Step 6 — Seed the database (one time)
+
+  1. Server service > click ... menu > Open Shell
+  2. Run: npx prisma db seed
+
+  ---
+  Part 3: AI Engine on Railway (same project)
+
+  Step 1 — Add service
+
+  1. In the same project, click + New > GitHub Repo > same Caliber repo
+
+  Step 2 — Configure
+
+  1. Settings:
+    - Root Directory: ai-engine
+    - Start Command: pip install -r requirements.txt && python -m spacy download en_core_web_sm && uvicorn app.main:app --host 0.0.0.0 --port $PORT
+  2. Variables:
+  DATABASE_URL        = (copy from PostgreSQL service, or use Railway's reference variable)
+  ASYNC_DATABASE_URL  = (same as DATABASE_URL but change postgresql:// to postgresql+asyncpg://)
+  SPACY_MODEL         = en_core_web_sm
+
+  Step 3 — Generate domain
+
+  1. Settings > Networking > Generate Domain
+  2. Copy URL (e.g., https://caliber-ai-production.up.railway.app)
+  3. Go back to your Server service > Variables > set AI_SERVICE_URL = this URL
+
+  ---
+  Part 4: Frontend on Netlify
+
+  Step 1 — Create site
+
+  1. Go to https://app.netlify.com > Add new site > Import from Git
+  2. Select your Caliber repo
+
+  Step 2 — Build settings
+
+  Base directory:    client
+  Build command:     npm run build
+  Publish directory: client/dist
+
+  Step 3 — Environment variable
+
+  VITE_API_URL = https://caliber-server-production.up.railway.app/api
+  (use your actual Railway server URL)
+
+  Step 4 — Deploy
+
+  Click deploy. Netlify gives you a URL like https://caliber-xxxxx.netlify.app
+
+  ---
+  Part 5: Connect everything
+
+  Now update the cross-references:
+
+  ┌────────────────┬────────────────┬───────────────────────────────────────────────────────┐
+  │     Where      │    Variable    │                         Value                         │
+  ├────────────────┼────────────────┼───────────────────────────────────────────────────────┤
+  │ Railway Server │ CLIENT_URL     │ https://caliber-xxxxx.netlify.app                    │
+  ├────────────────┼────────────────┼───────────────────────────────────────────────────────┤
+  │ Railway Server │ AI_SERVICE_URL │ https://caliber-ai-production.up.railway.app         │
+  ├────────────────┼────────────────┼───────────────────────────────────────────────────────┤
+  │ Netlify        │ VITE_API_URL   │ https://caliber-server-production.up.railway.app/api │
+  └────────────────┴────────────────┴───────────────────────────────────────────────────────┘
+
+  After updating, Railway auto-redeploys. On Netlify, trigger a redeploy from Deploys > Trigger deploy.
+
+  ---
+  Verify
+
+  1. Open your Netlify URL - landing page should load
+  2. Register a new account
+  3. Log in
+  4. If you seeded: admin@caliber.com / Admin123!
+
+  That's it - 3 services, all connected. Should take about 15-20 minutes total.

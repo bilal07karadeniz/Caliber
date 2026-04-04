@@ -9,10 +9,10 @@ interface CardProps {
 
 export default function Card({ children, className, header, footer }: CardProps) {
   return (
-    <div className={twMerge('bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden', className)}>
-      {header && <div className="px-6 py-4 border-b border-gray-200">{header}</div>}
-      <div className="px-6 py-4">{children}</div>
-      {footer && <div className="px-6 py-4 border-t border-gray-100 bg-gray-50">{footer}</div>}
+    <div className={twMerge('bg-surface-raised border border-ink-200 rounded-md overflow-hidden', className)}>
+      {header && <div className="px-5 py-4 border-b-2 border-ink-900 font-heading">{header}</div>}
+      <div className="px-5 py-4">{children}</div>
+      {footer && <div className="px-5 py-3 border-t border-ink-200 bg-surface-sunken">{footer}</div>}
     </div>
   );
 }

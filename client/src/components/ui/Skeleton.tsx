@@ -8,8 +8,8 @@ interface SkeletonProps {
 export default function Skeleton({ className, variant = 'text' }: SkeletonProps) {
   return (
     <div className={clsx(
-      'animate-pulse bg-gray-200',
-      { 'h-4 rounded': variant === 'text', 'rounded-full': variant === 'circular', 'rounded-lg': variant === 'rectangular' },
+      'animate-pulse bg-ink-100',
+      { 'h-4 rounded-sm': variant === 'text', 'rounded-full': variant === 'circular', 'rounded-md': variant === 'rectangular' },
       className
     )} />
   );

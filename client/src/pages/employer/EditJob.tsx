@@ -54,7 +54,7 @@ export default function EditJob() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Edit Job Posting</h1>
+      <h1 className="font-heading text-2xl font-bold text-ink-900 mb-6">Edit Job Posting</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <div className="space-y-4 max-w-2xl">
@@ -71,18 +71,18 @@ export default function EditJob() {
               <Input label="Max Salary" type="number" {...register('salaryMax')} />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Skills</label>
+              <p className="label mb-2">Skills</p>
               <div className="flex flex-wrap gap-2 mb-3">
                 {skills.map((s, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
-                    {s.name} (L{s.requiredLevel})
-                    <button type="button" onClick={() => setSkills(skills.filter((_, j) => j !== i))} className="hover:text-red-500">&times;</button>
+                  <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 border border-ink-200 rounded-md font-mono text-xs text-ink-700">
+                    {s.name} <span className="text-ink-400">L{s.requiredLevel}</span>
+                    <button type="button" onClick={() => setSkills(skills.filter((_, j) => j !== i))} className="hover:text-signal-high transition-colors">&times;</button>
                   </span>
                 ))}
               </div>
               <div className="flex gap-2">
-                <input className="flex-1 px-3 py-2 border rounded-lg text-sm" value={skillName} onChange={(e) => setSkillName(e.target.value)} placeholder="Skill name" />
-                <select value={skillLevel} onChange={(e) => setSkillLevel(Number(e.target.value))} className="px-3 py-2 border rounded-lg text-sm"><option value={1}>1</option><option value={2}>2</option><option value={3}>3</option><option value={4}>4</option><option value={5}>5</option></select>
+                <input className="flex-1 px-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none" value={skillName} onChange={(e) => setSkillName(e.target.value)} placeholder="Skill name" />
+                <select value={skillLevel} onChange={(e) => setSkillLevel(Number(e.target.value))} className="px-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none"><option value={1}>1</option><option value={2}>2</option><option value={3}>3</option><option value={4}>4</option><option value={5}>5</option></select>
                 <Button type="button" variant="secondary" size="sm" onClick={addSkill}>Add</Button>
               </div>
             </div>

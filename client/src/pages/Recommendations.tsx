@@ -11,6 +11,20 @@ import { recommendationApi } from '../services/api';
 import toast from 'react-hot-toast';
 import type { AiRecommendation } from '../types';
 
+function SignalBar({ score }: { score: number }) {
+  const level = score >= 80 ? 'high' : score >= 60 ? 'mid' : 'low';
+  const colorMap = { high: 'bg-signal-high', mid: 'bg-signal-mid', low: 'bg-signal-low' };
+  const bgMap = { high: 'bg-signal-high-bg', mid: 'bg-signal-mid-bg', low: 'bg-signal-low-bg' };
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <span className="font-mono tabular-nums text-lg font-bold text-ink-900">{Math.round(score)}%</span>
+      <div className={`w-16 h-1.5 rounded-sm ${bgMap[level]}`}>
+        <div className={`h-full rounded-sm ${colorMap[level]}`} style={{ width: `${score}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export default function Recommendations() {
   const [recs, setRecs] = useState<AiRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
@@ -41,7 +55,7 @@ export default function Recommendations() {
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">AI Recommendations</h1>
+        <h1 className="font-heading text-2xl font-bold text-ink-900">AI Recommendations</h1>
         <Button variant="outline" onClick={handleRefresh} isLoading={refreshing}>
           <RefreshCw className="w-4 h-4 mr-2" /> Refresh
         </Button>
@@ -56,18 +70,16 @@ export default function Recommendations() {
               <div className="flex flex-col md:flex-row justify-between gap-4">
                 <div className="flex-1">
                   <div className="flex items-start gap-4">
-                    <div className={`w-14 h-14 rounded-full flex items-center justify-center text-lg font-bold text-white shrink-0 ${rec.matchScore >= 80 ? 'bg-green-500' : rec.matchScore >= 60 ? 'bg-yellow-500' : 'bg-red-500'}`}>
-                      {Math.round(rec.matchScore)}%
-                    </div>
+                    <SignalBar score={rec.matchScore} />
                     <div>
-                      <Link to={`/jobs/${rec.jobId}`} className="text-lg font-semibold text-gray-900 hover:text-primary-600">{rec.job?.title || 'Job Position'}</Link>
-                      <p className="text-sm text-gray-500">{rec.job?.employer?.companyProfile?.companyName} · {rec.job?.location}</p>
-                      {rec.explanation && <p className="text-sm text-gray-600 mt-2">{rec.explanation}</p>}
+                      <Link to={`/jobs/${rec.jobId}`} className="font-heading text-lg font-semibold text-ink-900 hover:text-verdant-600 transition-colors">{rec.job?.title || 'Job Position'}</Link>
+                      <p className="text-sm text-ink-500">{rec.job?.employer?.companyProfile?.companyName} · {rec.job?.location}</p>
+                      {rec.explanation && <p className="text-sm text-ink-600 mt-2 font-body">{rec.explanation}</p>}
                       {rec.skillGap && rec.skillGap.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">
-                          <span className="text-xs text-gray-500 mr-1">Skill gaps:</span>
+                          <span className="label mr-1">Skill gaps:</span>
                           {rec.skillGap.slice(0, 3).map((sg, i) => (
-                            <Badge key={i} variant="warning">{sg.skill_name}</Badge>
+                            <span key={i} className="inline-flex items-center px-2 py-0.5 border border-saffron-300 rounded-md font-mono text-xs text-saffron-700">{sg.skill_name}</span>
                           ))}
                         </div>
                       )}

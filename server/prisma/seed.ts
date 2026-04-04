@@ -25,9 +25,9 @@ async function main() {
 
   // Create admins
   const admins = await Promise.all([
-    prisma.user.create({ data: { name: 'Admin User', email: 'admin@aimatch.com', password: adminPassword, role: 'ADMIN' } }),
-    prisma.user.create({ data: { name: 'System Admin', email: 'sysadmin@aimatch.com', password: adminPassword, role: 'ADMIN' } }),
-    prisma.user.create({ data: { name: 'Super Admin', email: 'superadmin@aimatch.com', password: adminPassword, role: 'ADMIN' } }),
+    prisma.user.create({ data: { name: 'Admin User', email: 'admin@caliber.com', password: adminPassword, role: 'ADMIN' } }),
+    prisma.user.create({ data: { name: 'System Admin', email: 'sysadmin@caliber.com', password: adminPassword, role: 'ADMIN' } }),
+    prisma.user.create({ data: { name: 'Super Admin', email: 'superadmin@caliber.com', password: adminPassword, role: 'ADMIN' } }),
   ]);
 
   // Create employers with company profiles

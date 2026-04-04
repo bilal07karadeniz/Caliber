@@ -3,9 +3,9 @@ version: '3.8'
 services:
   postgres:
     image: postgres:16
-    container_name: ai-match-db
+    container_name: caliber-db
     environment:
-      POSTGRES_DB: ai_match
+      POSTGRES_DB: caliber
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:
@@ -13,23 +13,23 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ai-match-network
+      - caliber-network
 
   redis:
     image: redis:7
-    container_name: ai-match-redis
+    container_name: caliber-redis
     ports:
       - "6379:6379"
     networks:
-      - ai-match-network
+      - caliber-network
 
   server:
     build: ./server
-    container_name: ai-match-server
+    container_name: caliber-server
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_match
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/caliber
       JWT_SECRET: dev-jwt-secret
       JWT_REFRESH_SECRET: dev-jwt-refresh-secret
       AI_SERVICE_URL: http://ai-engine:8000
@@ -42,15 +42,15 @@ services:
       - ./server/src:/app/src
       - ./uploads:/app/uploads
     networks:
-      - ai-match-network
+      - caliber-network
 
   ai-engine:
     build: ./ai-engine
-    container_name: ai-match-ai
+    container_name: caliber-ai
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_match
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/caliber
       SPACY_MODEL: en_core_web_md
     depends_on:
       - postgres
@@ -58,11 +58,11 @@ services:
       - ./ai-engine/app:/app/app
       - ./uploads:/app/uploads
     networks:
-      - ai-match-network
+      - caliber-network
 
   client:
     build: ./client
-    container_name: ai-match-client
+    container_name: caliber-client
     ports:
       - "5173:5173"
     environment:
@@ -73,11 +73,11 @@ services:
     volumes:
       - ./client/src:/app/src
     networks:
-      - ai-match-network
+      - caliber-network
 
 volumes:
   postgres_data:
 
 networks:
-  ai-match-network:
+  caliber-network:
     driver: bridge

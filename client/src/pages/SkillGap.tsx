@@ -31,17 +31,17 @@ export default function SkillGap() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Skill Gap Analysis</h1>
+      <h1 className="font-heading text-2xl font-bold text-ink-900 mb-6">Skill Gap Analysis</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <Card header={<h3 className="font-semibold">Your Skills</h3>}>
+        <Card header={<h3 className="font-heading font-semibold text-ink-900">Your Skills</h3>}>
           {user?.userSkills?.length ? (
             <div className="flex flex-wrap gap-2">
               {user.userSkills.map((us) => (
-                <div key={us.id} className="px-3 py-1.5 bg-primary-50 rounded-lg">
-                  <span className="text-sm font-medium text-primary-700">{us.skill?.name}</span>
-                  <span className="text-xs text-primary-500 ml-1">({us.proficiencyLevel}/5)</span>
-                </div>
+                <span key={us.id} className="inline-flex items-center px-2.5 py-1 border border-verdant-300 rounded-md font-mono text-xs text-verdant-700">
+                  {us.skill?.name}
+                  <span className="text-verdant-500 ml-1 tabular-nums">({us.proficiencyLevel}/5)</span>
+                </span>
               ))}
             </div>
           ) : (
@@ -49,52 +49,61 @@ export default function SkillGap() {
           )}
         </Card>
 
-        <Card header={<h3 className="font-semibold">Career Insights</h3>}>
+        <Card header={<h3 className="font-heading font-semibold text-ink-900">Career Insights</h3>}>
           {insights ? (
             <div className="space-y-3">
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Strongest Areas</p>
+                <p className="label mb-1">Strongest Areas</p>
                 <div className="flex flex-wrap gap-1">
-                  {insights.strongest_areas?.map((a: string) => <Badge key={a} variant="success">{a}</Badge>)}
+                  {insights.strongest_areas?.map((a: string) => (
+                    <span key={a} className="inline-flex items-center px-2 py-0.5 border border-verdant-300 rounded-md font-mono text-xs text-verdant-700">{a}</span>
+                  ))}
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Recommended Paths</p>
+                <p className="label mb-1">Recommended Paths</p>
                 <div className="flex flex-wrap gap-1">
-                  {insights.recommended_paths?.map((p: string) => <Badge key={p} variant="info">{p}</Badge>)}
+                  {insights.recommended_paths?.map((p: string) => (
+                    <span key={p} className="inline-flex items-center px-2 py-0.5 border border-ink-200 rounded-md font-mono text-xs text-ink-700">{p}</span>
+                  ))}
                 </div>
               </div>
               <div>
-                <p className="text-sm font-medium text-gray-500 mb-1">Next Skills to Learn</p>
+                <p className="label mb-1">Next Skills to Learn</p>
                 <div className="flex flex-wrap gap-1">
-                  {insights.next_skills?.map((s: string) => <Badge key={s} variant="warning">{s}</Badge>)}
+                  {insights.next_skills?.map((s: string) => (
+                    <span key={s} className="inline-flex items-center px-2 py-0.5 border border-saffron-300 rounded-md font-mono text-xs text-saffron-700">{s}</span>
+                  ))}
                 </div>
               </div>
-              {insights.summary && <p className="text-sm text-gray-600 mt-2">{insights.summary}</p>}
+              {insights.summary && <p className="text-sm text-ink-600 mt-2 font-body">{insights.summary}</p>}
             </div>
           ) : (
-            <p className="text-sm text-gray-500">Upload a resume and add skills to get career insights.</p>
+            <p className="text-sm text-ink-500 font-body">Upload a resume and add skills to get career insights.</p>
           )}
         </Card>
       </div>
 
-      <Card header={<h3 className="font-semibold">Recommended Learning Path</h3>}>
+      <Card header={<h3 className="font-heading font-semibold text-ink-900">Recommended Learning Path</h3>}>
         {learningPath?.courses?.length ? (
           <div className="space-y-3">
             {learningPath.courses.map((c: any, i: number) => (
-              <div key={i} className="flex items-center justify-between p-3 border rounded-lg">
+              <div key={i} className="flex items-center justify-between p-3 border border-ink-200 rounded-md transition-colors hover:bg-surface-sunken">
                 <div>
-                  <p className="font-medium text-sm">{c.resource_title}</p>
-                  <p className="text-xs text-gray-500">{c.provider} · {c.estimated_duration} · <Badge variant={c.priority === 'critical' ? 'error' : c.priority === 'moderate' ? 'warning' : 'info'}>{c.priority}</Badge></p>
-                  <p className="text-xs text-gray-400 mt-0.5">For: {c.skill_name}</p>
+                  <p className="font-medium text-sm text-ink-900">{c.resource_title}</p>
+                  <p className="text-xs text-ink-500 flex items-center gap-2">
+                    {c.provider} · {c.estimated_duration} ·
+                    <Badge variant={c.priority === 'critical' ? 'error' : c.priority === 'moderate' ? 'warning' : 'info'}>{c.priority}</Badge>
+                  </p>
+                  <p className="text-xs text-ink-400 mt-0.5">For: <span className="font-mono">{c.skill_name}</span></p>
                 </div>
                 {c.url && c.url !== '#' && (
-                  <a href={c.url} target="_blank" rel="noopener" className="text-primary-600 text-sm hover:underline shrink-0">View</a>
+                  <a href={c.url} target="_blank" rel="noopener" className="text-verdant-600 text-sm hover:underline underline-offset-4 shrink-0 transition-colors">View</a>
                 )}
               </div>
             ))}
             {learningPath.estimated_total_hours && (
-              <p className="text-sm text-gray-500 mt-2">Estimated total: {learningPath.estimated_total_hours}</p>
+              <p className="text-sm text-ink-500 mt-2 font-body">Estimated total: <span className="font-mono tabular-nums">{learningPath.estimated_total_hours}</span></p>
             )}
           </div>
         ) : (

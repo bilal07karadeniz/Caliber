@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 
-echo "=== AI Match Deployment ==="
+echo "=== Caliber Deployment ==="
 
 echo "1. Building server..."
 cd server

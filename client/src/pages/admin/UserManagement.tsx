@@ -41,7 +41,7 @@ export default function UserManagement() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">User Management</h1>
+      <h1 className="font-heading text-2xl font-bold text-ink-900 mb-6">User Management</h1>
 
       <div className="flex gap-3 mb-6">
         <Input placeholder="Search by name or email..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} className="max-w-xs" />
@@ -51,22 +51,22 @@ export default function UserManagement() {
 
       {loading ? <div className="flex justify-center py-20"><Spinner size="lg" /></div> : (
         <>
-          <div className="bg-white rounded-xl border overflow-hidden">
+          <div className="bg-surface-raised border border-ink-200 rounded-md overflow-hidden">
             <table className="w-full">
-              <thead className="bg-gray-50">
+              <thead className="bg-surface-sunken">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">User</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Role</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  <th className="px-4 py-3 text-left label">User</th>
+                  <th className="px-4 py-3 text-left label hidden md:table-cell">Email</th>
+                  <th className="px-4 py-3 text-left label">Role</th>
+                  <th className="px-4 py-3 text-left label">Status</th>
+                  <th className="px-4 py-3 text-left label">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y">
+              <tbody className="divide-y divide-ink-200">
                 {users.map((u) => (
-                  <tr key={u.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3"><div className="flex items-center gap-2"><Avatar name={u.name} src={u.avatar || undefined} size="sm" /><span className="text-sm font-medium">{u.name}</span></div></td>
-                    <td className="px-4 py-3 text-sm text-gray-500 hidden md:table-cell">{u.email}</td>
+                  <tr key={u.id} className="hover:bg-surface-sunken transition-colors">
+                    <td className="px-4 py-3"><div className="flex items-center gap-2"><Avatar name={u.name} src={u.avatar || undefined} size="sm" /><span className="text-sm font-medium text-ink-900">{u.name}</span></div></td>
+                    <td className="px-4 py-3 text-sm text-ink-500 hidden md:table-cell">{u.email}</td>
                     <td className="px-4 py-3"><Badge variant="info">{u.role.replace('_', ' ')}</Badge></td>
                     <td className="px-4 py-3"><Badge variant={u.isActive ? 'success' : 'error'}>{u.isActive ? 'Active' : 'Inactive'}</Badge></td>
                     <td className="px-4 py-3"><Button variant="ghost" size="sm" onClick={() => toggleActive(u.id)}>{u.isActive ? 'Deactivate' : 'Activate'}</Button></td>

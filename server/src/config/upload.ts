@@ -1,6 +1,7 @@
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import { config } from './index';
 
 const ensureDir = (dir: string) => {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
@@ -8,7 +9,7 @@ const ensureDir = (dir: string) => {
 
 const avatarStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    const dir = 'uploads/avatars';
+    const dir = path.join(config.uploadDir, 'avatars');
     ensureDir(dir);
     cb(null, dir);
   },
@@ -20,7 +21,7 @@ const avatarStorage = multer.diskStorage({
 
 const resumeStorage = multer.diskStorage({
   destination: (_req, _file, cb) => {
-    const dir = 'uploads/resumes';
+    const dir = path.join(config.uploadDir, 'resumes');
     ensureDir(dir);
     cb(null, dir);
   },

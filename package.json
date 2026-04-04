@@ -1,5 +1,5 @@
 {
-  "name": "ai-match",
+  "name": "caliber",
   "version": "1.0.0",
   "private": true,
   "workspaces": ["client", "server"],

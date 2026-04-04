@@ -1,7 +1,7 @@
 [project]
-name = "ai-match-engine"
+name = "caliber-engine"
 version = "1.0.0"
-description = "AI Engine for Job Matching Platform"
+description = "Caliber - AI Engine for Job Matching"
 requires-python = ">=3.11"
 
 [tool.pytest.ini_options]

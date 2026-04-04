@@ -14,7 +14,7 @@ export default function ProtectedRoute({ children, allowedRoles }: Props) {
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600" />
+        <div className="h-1 w-24 bg-ink-200 rounded-full overflow-hidden"><div className="h-full w-1/3 bg-verdant-500 rounded-full animate-pulse-line" /></div>
       </div>
     );
   }

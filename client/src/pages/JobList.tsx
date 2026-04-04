@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
 import MainLayout from '../layouts/MainLayout';
 import JobCard from '../components/jobs/JobCard';
-import Input from '../components/ui/Input';
 import Select from '../components/ui/Select';
 import Pagination from '../components/ui/Pagination';
 import Spinner from '../components/ui/Spinner';
@@ -40,16 +39,16 @@ export default function JobList() {
 
   return (
     <MainLayout>
-      <div className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-        <h1 className="text-3xl font-bold mb-6">Find Jobs</h1>
+      <div className="max-w-6xl mx-auto px-4 py-8 sm:px-6">
+        <h1 className="font-heading text-3xl font-bold text-ink-900 mb-6">Find Jobs</h1>
 
-        <div className="bg-white rounded-xl border p-4 mb-6">
+        <div className="bg-surface-raised border border-ink-200 rounded-md p-4 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div className="relative">
-              <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-              <input className="w-full pl-9 pr-3 py-2 border rounded-lg text-sm" placeholder="Search jobs..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
+              <Search className="absolute left-3 top-2.5 w-4 h-4 text-ink-400" />
+              <input className="w-full pl-9 pr-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none" placeholder="Search jobs..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
             </div>
-            <input className="w-full px-3 py-2 border rounded-lg text-sm" placeholder="Location..." value={location} onChange={(e) => { setLocation(e.target.value); setPage(1); }} />
+            <input className="w-full px-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none" placeholder="Location..." value={location} onChange={(e) => { setLocation(e.target.value); setPage(1); }} />
             <Select value={employmentType} onChange={(e) => { setEmploymentType(e.target.value); setPage(1); }}
               options={[{ value: '', label: 'All Types' }, { value: 'FULL_TIME', label: 'Full Time' }, { value: 'PART_TIME', label: 'Part Time' }, { value: 'CONTRACT', label: 'Contract' }, { value: 'INTERNSHIP', label: 'Internship' }, { value: 'REMOTE', label: 'Remote' }]} />
             <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}

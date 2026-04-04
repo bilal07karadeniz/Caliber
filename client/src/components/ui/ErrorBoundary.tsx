@@ -6,23 +6,19 @@ interface State { hasError: boolean; }
 
 export default class ErrorBoundary extends Component<Props, State> {
   state: State = { hasError: false };
-
   static getDerivedStateFromError(): State { return { hasError: true }; }
-
-  componentDidCatch(error: Error, info: ErrorInfo) {
-    console.error('ErrorBoundary caught:', error, info);
-  }
+  componentDidCatch(error: Error, info: ErrorInfo) { console.error('ErrorBoundary:', error, info); }
 
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Something went wrong</h2>
-            <p className="text-gray-500 mb-4">An unexpected error occurred.</p>
-            <Button onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}>
-              Try Again
-            </Button>
+        <div className="min-h-screen flex items-center justify-center bg-surface">
+          <div>
+            <h2 className="font-heading text-3xl font-bold text-ink-900">Something broke</h2>
+            <p className="text-ink-500 mt-2">An unexpected error occurred.</p>
+            <div className="mt-6">
+              <Button onClick={() => { this.setState({ hasError: false }); window.location.reload(); }}>Reload</Button>
+            </div>
           </div>
         </div>
       );

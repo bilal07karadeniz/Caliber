@@ -12,8 +12,8 @@ export default function Avatar({ src, name, size = 'md', className }: AvatarProp
 
   return (
     <div className={clsx(
-      'rounded-full flex items-center justify-center font-medium text-white bg-primary-600 overflow-hidden',
-      { 'w-8 h-8 text-xs': size === 'sm', 'w-10 h-10 text-sm': size === 'md', 'w-14 h-14 text-lg': size === 'lg' },
+      'rounded-full flex items-center justify-center font-mono text-white bg-ink-800 overflow-hidden',
+      { 'w-7 h-7 text-[10px]': size === 'sm', 'w-9 h-9 text-xs': size === 'md', 'w-12 h-12 text-sm': size === 'lg' },
       className
     )}>
       {src ? <img src={src} alt={name} className="w-full h-full object-cover" /> : initials}

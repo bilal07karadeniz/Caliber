@@ -10,21 +10,21 @@ const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   ({ className, label, error, maxLength, value, ...props }, ref) => {
     return (
       <div className="w-full">
-        {label && <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>}
+        {label && <label className="label mb-2 block">{label}</label>}
         <textarea
           ref={ref}
           value={value}
           maxLength={maxLength}
           className={twMerge(
-            'w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-y min-h-[80px]',
-            error ? 'border-red-500' : 'border-gray-300',
+            'w-full bg-surface-sunken border border-ink-200 rounded-md py-3 px-3 text-ink-900 placeholder:text-ink-300 focus:outline-none focus:border-verdant-500 transition-colors font-body resize-y min-h-[100px]',
+            error ? 'border-signal-low' : '',
             className
           )}
           {...props}
         />
-        <div className="flex justify-between mt-1">
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          {maxLength && <p className="text-xs text-gray-400 ml-auto">{String(value || '').length}/{maxLength}</p>}
+        <div className="flex justify-between mt-1.5">
+          {error && <p className="text-xs text-signal-low">{error}</p>}
+          {maxLength && <p className="text-xs font-mono text-ink-400 ml-auto">{String(value || '').length}/{maxLength}</p>}
         </div>
       </div>
     );

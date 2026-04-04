@@ -8,7 +8,6 @@ import Input from '../../components/ui/Input';
 import TextArea from '../../components/ui/TextArea';
 import Select from '../../components/ui/Select';
 import Button from '../../components/ui/Button';
-import Badge from '../../components/ui/Badge';
 import { jobApi } from '../../services/api';
 
 export default function CreateJob() {
@@ -39,11 +38,11 @@ export default function CreateJob() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Create Job Posting</h1>
+      <h1 className="font-heading text-2xl font-bold text-ink-900 mb-6">Create Job Posting</h1>
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-6">
-            <Card header={<h3 className="font-semibold">Job Details</h3>}>
+            <Card header={<h3 className="font-heading font-semibold text-ink-900">Job Details</h3>}>
               <div className="space-y-4">
                 <Input label="Job Title" {...register('title', { required: 'Required' })} error={errors.title?.message as string} placeholder="e.g. Senior React Developer" />
                 <TextArea label="Description" {...register('description', { required: 'Required' })} error={errors.description?.message as string} placeholder="Describe the role, responsibilities..." className="min-h-[150px]" />
@@ -60,20 +59,20 @@ export default function CreateJob() {
               </div>
             </Card>
 
-            <Card header={<h3 className="font-semibold">Required Skills</h3>}>
+            <Card header={<h3 className="font-heading font-semibold text-ink-900">Required Skills</h3>}>
               <div className="flex flex-wrap gap-2 mb-4">
                 {skills.map((s, i) => (
-                  <span key={i} className="inline-flex items-center gap-1 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-sm">
-                    {s.name} (Level {s.requiredLevel})
-                    <button onClick={() => setSkills(skills.filter((_, j) => j !== i))} className="ml-1 hover:text-red-500">&times;</button>
+                  <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 border border-ink-200 rounded-md font-mono text-xs text-ink-700">
+                    {s.name} <span className="text-ink-400">L{s.requiredLevel}</span>
+                    <button onClick={() => setSkills(skills.filter((_, j) => j !== i))} className="ml-1 hover:text-signal-high transition-colors">&times;</button>
                   </span>
                 ))}
               </div>
               <div className="flex gap-2 items-end">
                 <Input label="Skill Name" value={skillName} onChange={(e) => setSkillName(e.target.value)} placeholder="e.g. React" />
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
-                  <select value={skillLevel} onChange={(e) => setSkillLevel(Number(e.target.value))} className="px-3 py-2 border rounded-lg">
+                  <p className="label mb-1">Level</p>
+                  <select value={skillLevel} onChange={(e) => setSkillLevel(Number(e.target.value))} className="px-3 py-2 border border-ink-200 rounded-md font-body text-sm transition-colors focus:border-verdant-500 focus:outline-none">
                     {[1, 2, 3, 4, 5].map((l) => <option key={l} value={l}>{l}</option>)}
                   </select>
                 </div>
@@ -83,7 +82,7 @@ export default function CreateJob() {
           </div>
 
           <div>
-            <Card header={<h3 className="font-semibold">Actions</h3>}>
+            <Card header={<h3 className="font-heading font-semibold text-ink-900">Actions</h3>}>
               <Button type="submit" className="w-full" isLoading={loading}>Publish Job</Button>
             </Card>
           </div>

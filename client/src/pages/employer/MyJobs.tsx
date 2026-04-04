@@ -39,7 +39,7 @@ export default function MyJobs() {
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">My Job Postings</h1>
+        <h1 className="font-heading text-2xl font-bold text-ink-900">My Job Postings</h1>
         <Link to="/employer/jobs/new"><Button><PlusCircle className="w-4 h-4 mr-2" /> Create Job</Button></Link>
       </div>
 
@@ -51,10 +51,10 @@ export default function MyJobs() {
             <Card key={job.id}>
               <div className="flex flex-col sm:flex-row justify-between gap-3">
                 <div>
-                  <Link to={`/jobs/${job.id}`} className="font-semibold hover:text-primary-600">{job.title}</Link>
-                  <div className="flex items-center gap-3 mt-1 text-sm text-gray-500">
+                  <Link to={`/jobs/${job.id}`} className="font-heading font-semibold text-ink-900 hover:text-verdant-600 transition-colors">{job.title}</Link>
+                  <div className="flex items-center gap-3 mt-1 text-sm text-ink-500">
                     <span>{job.location}</span>
-                    <span>{job._count?.applications || 0} applicants</span>
+                    <span className="font-mono tabular-nums">{job._count?.applications || 0} applicants</span>
                     <span>{new Date(job.createdAt).toLocaleDateString()}</span>
                   </div>
                 </div>
@@ -62,7 +62,7 @@ export default function MyJobs() {
                   <Badge variant={job.isActive ? 'success' : 'neutral'}>{job.isActive ? 'Active' : 'Inactive'}</Badge>
                   <Link to={`/employer/jobs/${job.id}/applicants`}><Button variant="ghost" size="sm"><Users className="w-4 h-4" /></Button></Link>
                   <Link to={`/employer/jobs/${job.id}/edit`}><Button variant="ghost" size="sm"><Edit className="w-4 h-4" /></Button></Link>
-                  <Button variant="ghost" size="sm" onClick={() => handleDelete(job.id)}><Trash2 className="w-4 h-4 text-red-500" /></Button>
+                  <Button variant="ghost" size="sm" onClick={() => handleDelete(job.id)}><Trash2 className="w-4 h-4 text-signal-high" /></Button>
                 </div>
               </div>
             </Card>

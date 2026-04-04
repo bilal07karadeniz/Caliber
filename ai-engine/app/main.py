@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes import resume, matching, skill_gap, admin
 
 app = FastAPI(
-    title="AI Match Engine",
-    description="AI-powered job matching and resume parsing service",
+    title="Caliber Engine",
+    description="Caliber - AI-powered job matching and resume parsing service",
     version="1.0.0",
 )
 

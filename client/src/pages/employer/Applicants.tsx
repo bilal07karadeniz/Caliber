@@ -49,8 +49,8 @@ export default function Applicants() {
   return (
     <DashboardLayout>
       <div className="mb-6">
-        <Link to="/employer/jobs" className="text-sm text-primary-600 hover:underline mb-2 inline-block">&larr; Back to Jobs</Link>
-        <h1 className="text-2xl font-bold">Applicants ({applications.length})</h1>
+        <Link to="/employer/jobs" className="text-sm text-verdant-600 hover:underline underline-offset-4 mb-2 inline-block transition-colors">&larr; Back to Jobs</Link>
+        <h1 className="font-heading text-2xl font-bold text-ink-900">Applicants (<span className="font-mono tabular-nums">{applications.length}</span>)</h1>
       </div>
 
       {applications.length === 0 ? (
@@ -63,10 +63,10 @@ export default function Applicants() {
                 <div className="flex items-start gap-3">
                   <Avatar name={app.user?.name || 'User'} src={app.user?.avatar || undefined} />
                   <div>
-                    <p className="font-semibold">{app.user?.name}</p>
-                    <p className="text-sm text-gray-500">{app.user?.email} {app.user?.location && `· ${app.user.location}`}</p>
-                    <p className="text-xs text-gray-400 mt-1">Applied {new Date(app.appliedAt).toLocaleDateString()}</p>
-                    {app.coverLetter && <p className="text-sm text-gray-600 mt-2 line-clamp-2">{app.coverLetter}</p>}
+                    <p className="font-heading font-semibold text-ink-900">{app.user?.name}</p>
+                    <p className="text-sm text-ink-500">{app.user?.email} {app.user?.location && `· ${app.user.location}`}</p>
+                    <p className="text-xs text-ink-400 mt-1">Applied {new Date(app.appliedAt).toLocaleDateString()}</p>
+                    {app.coverLetter && <p className="text-sm text-ink-600 mt-2 line-clamp-2 font-body">{app.coverLetter}</p>}
                   </div>
                 </div>
                 <div className="flex flex-col items-end gap-2">

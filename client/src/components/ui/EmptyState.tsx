@@ -1,5 +1,3 @@
-import { Inbox } from 'lucide-react';
-
 interface EmptyStateProps {
   icon?: React.ReactNode;
   title: string;
@@ -7,13 +5,14 @@ interface EmptyStateProps {
   action?: React.ReactNode;
 }
 
-export default function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+export default function EmptyState({ title, description, action }: EmptyStateProps) {
   return (
-    <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div className="text-gray-400 mb-4">{icon || <Inbox className="w-12 h-12" />}</div>
-      <h3 className="text-lg font-medium text-gray-900 mb-1">{title}</h3>
-      {description && <p className="text-sm text-gray-500 mb-4 max-w-sm">{description}</p>}
-      {action}
+    <div className="py-16">
+      <div className="border-t border-ink-200 pt-6">
+        <h3 className="font-heading text-xl text-ink-300">{title}</h3>
+        {description && <p className="text-sm text-ink-400 mt-1">{description}</p>}
+        {action && <div className="mt-4">{action}</div>}
+      </div>
     </div>
   );
 }

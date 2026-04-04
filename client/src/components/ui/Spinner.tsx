@@ -1,16 +1,8 @@
-import { clsx } from 'clsx';
-
-interface SpinnerProps {
-  size?: 'sm' | 'md' | 'lg';
-  className?: string;
-}
-
-export default function Spinner({ size = 'md', className }: SpinnerProps) {
+export default function Spinner({ size = 'md' }: { size?: 'sm' | 'md' | 'lg'; className?: string }) {
+  const h = size === 'sm' ? 'h-0.5 w-8' : size === 'md' ? 'h-0.5 w-16' : 'h-1 w-24';
   return (
-    <div className={clsx('animate-spin rounded-full border-2 border-gray-300 border-t-primary-600', {
-      'h-4 w-4': size === 'sm',
-      'h-8 w-8': size === 'md',
-      'h-12 w-12': size === 'lg',
-    }, className)} />
+    <div className={`${h} bg-ink-200 rounded-full overflow-hidden`}>
+      <div className="h-full w-1/3 bg-verdant-500 rounded-full animate-pulse-line" />
+    </div>
   );
 }

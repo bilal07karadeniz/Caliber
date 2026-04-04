@@ -96,12 +96,12 @@ export default function Profile() {
 
   return (
     <DashboardLayout>
-      <h1 className="text-2xl font-bold mb-6">Profile Settings</h1>
+      <h1 className="font-heading text-2xl font-bold text-ink-900 mb-6">Profile Settings</h1>
 
-      <div className="flex gap-2 mb-6 border-b">
+      <div className="flex gap-2 mb-6 border-b border-ink-200">
         {tabs.map((tab) => (
           <button key={tab} onClick={() => setActiveTab(tab)}
-            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab ? 'border-primary-600 text-primary-600' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+            className={`px-4 py-2 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab ? 'border-verdant-600 text-verdant-600' : 'border-transparent text-ink-500 hover:text-ink-700'}`}>
             {tab.charAt(0).toUpperCase() + tab.slice(1)}
           </button>
         ))}
@@ -125,17 +125,17 @@ export default function Profile() {
           <div className="space-y-4">
             <div className="flex flex-wrap gap-2 mb-4">
               {skills.map((s, i) => (
-                <span key={i} className="inline-flex items-center gap-1 px-3 py-1 bg-primary-50 text-primary-700 rounded-full text-sm">
-                  {s.skillName} ({s.proficiencyLevel}/5)
-                  <button onClick={() => setSkills(skills.filter((_, j) => j !== i))} className="ml-1 text-primary-400 hover:text-red-500">&times;</button>
+                <span key={i} className="inline-flex items-center gap-1 px-2.5 py-1 border border-ink-200 rounded-md font-mono text-xs text-ink-700">
+                  {s.skillName} <span className="text-ink-400">({s.proficiencyLevel}/5)</span>
+                  <button onClick={() => setSkills(skills.filter((_, j) => j !== i))} className="ml-1 text-ink-400 hover:text-signal-high transition-colors">&times;</button>
                 </span>
               ))}
             </div>
             <div className="flex gap-2 items-end">
               <Input label="Add Skill" value={newSkill} onChange={(e) => setNewSkill(e.target.value)} placeholder="e.g. React" />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Level</label>
-                <select value={newLevel} onChange={(e) => setNewLevel(Number(e.target.value))} className="px-3 py-2 border rounded-lg">
+                <p className="label mb-1">Level</p>
+                <select value={newLevel} onChange={(e) => setNewLevel(Number(e.target.value))} className="px-3 py-2 border border-ink-200 rounded-md font-body text-sm transition-colors focus:border-verdant-500 focus:outline-none">
                   {[1, 2, 3, 4, 5].map((l) => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
@@ -149,21 +149,23 @@ export default function Profile() {
       {activeTab === 'resumes' && (
         <Card>
           <div className="space-y-4">
-            <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-              <p className="text-gray-500 mb-2">Upload your resume (PDF, DOC, DOCX - max 10MB)</p>
+            <div className="border-2 border-dashed border-ink-300 rounded-md p-6 text-center">
+              <p className="text-ink-500 mb-2 font-body">Upload your resume (PDF, DOC, DOCX - max 10MB)</p>
               <input type="file" accept=".pdf,.doc,.docx" onChange={handleResumeUpload} className="hidden" id="resume-upload" />
               <label htmlFor="resume-upload">
-                <span className="inline-flex items-center px-4 py-2 border-2 border-primary-600 text-primary-600 rounded-lg text-sm font-medium cursor-pointer hover:bg-primary-50">{uploading ? 'Uploading...' : 'Choose File'}</span>
+                <span className="inline-flex items-center px-4 py-2 border-2 border-verdant-600 text-verdant-600 rounded-md text-sm font-medium cursor-pointer hover:bg-verdant-50 transition-colors">{uploading ? 'Uploading...' : 'Choose File'}</span>
               </label>
             </div>
             {resumes.map((r) => (
-              <div key={r.id} className="flex items-center justify-between p-4 border rounded-lg">
+              <div key={r.id} className="flex items-center justify-between p-4 border border-ink-200 rounded-md">
                 <div>
-                  <p className="font-medium text-sm">{r.fileName}</p>
-                  <p className="text-xs text-gray-500">{new Date(r.uploadedAt).toLocaleDateString()}</p>
+                  <p className="font-medium text-sm text-ink-900">{r.fileName}</p>
+                  <p className="text-xs text-ink-500">{new Date(r.uploadedAt).toLocaleDateString()}</p>
                   {r.parsedData?.skills?.length > 0 && (
                     <div className="flex flex-wrap gap-1 mt-2">
-                      {r.parsedData.skills.slice(0, 8).map((s: string) => <Badge key={s} variant="info">{s}</Badge>)}
+                      {r.parsedData.skills.slice(0, 8).map((s: string) => (
+                        <span key={s} className="inline-flex items-center px-2 py-0.5 border border-ink-200 rounded-md font-mono text-xs text-ink-600">{s}</span>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -186,8 +188,8 @@ export default function Profile() {
             <Input label="Website" {...companyForm.register('website')} />
             <TextArea label="Description" {...companyForm.register('description')} />
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Company Size</label>
-              <select {...companyForm.register('size')} className="w-full px-3 py-2 border rounded-lg">
+              <p className="label mb-1">Company Size</p>
+              <select {...companyForm.register('size')} className="w-full px-3 py-2 border border-ink-200 rounded-md font-body text-sm transition-colors focus:border-verdant-500 focus:outline-none">
                 <option value="">Select size</option>
                 {['1-10', '11-50', '51-200', '201-500', '500+'].map((s) => <option key={s} value={s}>{s} employees</option>)}
               </select>
