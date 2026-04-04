@@ -1,0 +1,13 @@
+{
+  "name": "ai-match",
+  "version": "1.0.0",
+  "private": true,
+  "workspaces": ["client", "server"],
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev:ai": "cd ai-engine && uvicorn app.main:app --reload --port 8000",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build"
+  }
+}

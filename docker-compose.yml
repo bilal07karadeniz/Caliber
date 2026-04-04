@@ -1,0 +1,83 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: ai-match-db
+    environment:
+      POSTGRES_DB: ai_match
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - ai-match-network
+
+  redis:
+    image: redis:7
+    container_name: ai-match-redis
+    ports:
+      - "6379:6379"
+    networks:
+      - ai-match-network
+
+  server:
+    build: ./server
+    container_name: ai-match-server
+    ports:
+      - "3001:3001"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_match
+      JWT_SECRET: dev-jwt-secret
+      JWT_REFRESH_SECRET: dev-jwt-refresh-secret
+      AI_SERVICE_URL: http://ai-engine:8000
+      CLIENT_URL: http://localhost:5173
+      PORT: 3001
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./server/src:/app/src
+      - ./uploads:/app/uploads
+    networks:
+      - ai-match-network
+
+  ai-engine:
+    build: ./ai-engine
+    container_name: ai-match-ai
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/ai_match
+      SPACY_MODEL: en_core_web_md
+    depends_on:
+      - postgres
+    volumes:
+      - ./ai-engine/app:/app/app
+      - ./uploads:/app/uploads
+    networks:
+      - ai-match-network
+
+  client:
+    build: ./client
+    container_name: ai-match-client
+    ports:
+      - "5173:5173"
+    environment:
+      VITE_API_URL: http://localhost:3001/api
+      VITE_AI_SERVICE_URL: http://localhost:8000
+    depends_on:
+      - server
+    volumes:
+      - ./client/src:/app/src
+    networks:
+      - ai-match-network
+
+volumes:
+  postgres_data:
+
+networks:
+  ai-match-network:
+    driver: bridge

@@ -1,0 +1,9 @@
+[project]
+name = "ai-match-engine"
+version = "1.0.0"
+description = "AI Engine for Job Matching Platform"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]

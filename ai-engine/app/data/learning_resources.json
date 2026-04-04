@@ -1,0 +1,96 @@
+{
+  "Python": [
+    {"title": "Python for Everybody", "type": "course", "provider": "Coursera", "duration": "20 hours", "url": "https://www.coursera.org/specializations/python"},
+    {"title": "Complete Python Bootcamp", "type": "course", "provider": "Udemy", "duration": "22 hours", "url": "https://www.udemy.com/course/complete-python-bootcamp/"}
+  ],
+  "JavaScript": [
+    {"title": "JavaScript: Understanding the Weird Parts", "type": "course", "provider": "Udemy", "duration": "12 hours", "url": "https://www.udemy.com/course/understand-javascript/"},
+    {"title": "The Complete JavaScript Course", "type": "course", "provider": "Udemy", "duration": "69 hours", "url": "https://www.udemy.com/course/the-complete-javascript-course/"}
+  ],
+  "TypeScript": [
+    {"title": "Understanding TypeScript", "type": "course", "provider": "Udemy", "duration": "15 hours", "url": "https://www.udemy.com/course/understanding-typescript/"}
+  ],
+  "React": [
+    {"title": "React - The Complete Guide", "type": "course", "provider": "Udemy", "duration": "48 hours", "url": "https://www.udemy.com/course/react-the-complete-guide-incl-redux/"},
+    {"title": "Full-Stack Web Development with React", "type": "course", "provider": "Coursera", "duration": "30 hours", "url": "https://www.coursera.org/specializations/full-stack-react"}
+  ],
+  "Node.js": [
+    {"title": "The Complete Node.js Developer Course", "type": "course", "provider": "Udemy", "duration": "35 hours", "url": "https://www.udemy.com/course/the-complete-nodejs-developer-course-2/"}
+  ],
+  "Docker": [
+    {"title": "Docker Mastery", "type": "course", "provider": "Udemy", "duration": "20 hours", "url": "https://www.udemy.com/course/docker-mastery/"},
+    {"title": "Docker Deep Dive", "type": "course", "provider": "Pluralsight", "duration": "15 hours", "url": "https://www.pluralsight.com/courses/docker-deep-dive"}
+  ],
+  "Kubernetes": [
+    {"title": "Kubernetes for the Absolute Beginners", "type": "course", "provider": "Udemy", "duration": "10 hours", "url": "https://www.udemy.com/course/learn-kubernetes/"},
+    {"title": "CKA Certification Course", "type": "certification", "provider": "Linux Foundation", "duration": "40 hours", "url": "https://training.linuxfoundation.org/certification/certified-kubernetes-administrator-cka/"}
+  ],
+  "AWS": [
+    {"title": "AWS Certified Solutions Architect", "type": "certification", "provider": "AWS", "duration": "40 hours", "url": "https://aws.amazon.com/certification/certified-solutions-architect-associate/"},
+    {"title": "Ultimate AWS Certified Cloud Practitioner", "type": "course", "provider": "Udemy", "duration": "14 hours", "url": "https://www.udemy.com/course/aws-certified-cloud-practitioner-new/"}
+  ],
+  "Machine Learning": [
+    {"title": "Machine Learning by Andrew Ng", "type": "course", "provider": "Coursera", "duration": "60 hours", "url": "https://www.coursera.org/learn/machine-learning"},
+    {"title": "Hands-On Machine Learning", "type": "course", "provider": "O'Reilly", "duration": "40 hours", "url": "https://www.oreilly.com/library/view/hands-on-machine-learning/9781098125967/"}
+  ],
+  "PostgreSQL": [
+    {"title": "The Complete SQL Bootcamp", "type": "course", "provider": "Udemy", "duration": "9 hours", "url": "https://www.udemy.com/course/the-complete-sql-bootcamp/"}
+  ],
+  "MongoDB": [
+    {"title": "MongoDB - The Complete Developer's Guide", "type": "course", "provider": "Udemy", "duration": "17 hours", "url": "https://www.udemy.com/course/mongodb-the-complete-developers-guide/"}
+  ],
+  "Git": [
+    {"title": "Git Complete", "type": "course", "provider": "Udemy", "duration": "6 hours", "url": "https://www.udemy.com/course/git-complete/"}
+  ],
+  "Angular": [
+    {"title": "Angular - The Complete Guide", "type": "course", "provider": "Udemy", "duration": "34 hours", "url": "https://www.udemy.com/course/the-complete-guide-to-angular-2/"}
+  ],
+  "Vue": [
+    {"title": "Vue - The Complete Guide", "type": "course", "provider": "Udemy", "duration": "32 hours", "url": "https://www.udemy.com/course/vuejs-2-the-complete-guide/"}
+  ],
+  "Django": [
+    {"title": "Python Django - The Practical Guide", "type": "course", "provider": "Udemy", "duration": "23 hours", "url": "https://www.udemy.com/course/python-django-the-practical-guide/"}
+  ],
+  "FastAPI": [
+    {"title": "FastAPI - The Complete Course", "type": "course", "provider": "Udemy", "duration": "18 hours", "url": "https://www.udemy.com/course/fastapi-the-complete-course/"}
+  ],
+  "Redis": [
+    {"title": "Redis: The Complete Developer's Guide", "type": "course", "provider": "Udemy", "duration": "12 hours", "url": "https://www.udemy.com/course/redis-the-complete-developers-guide-p/"}
+  ],
+  "NLP": [
+    {"title": "Natural Language Processing Specialization", "type": "course", "provider": "Coursera", "duration": "50 hours", "url": "https://www.coursera.org/specializations/natural-language-processing"}
+  ],
+  "TensorFlow": [
+    {"title": "TensorFlow Developer Certificate", "type": "certification", "provider": "Google", "duration": "40 hours", "url": "https://www.tensorflow.org/certificate"}
+  ],
+  "CI/CD": [
+    {"title": "GitHub Actions - The Complete Guide", "type": "course", "provider": "Udemy", "duration": "10 hours", "url": "https://www.udemy.com/course/github-actions-the-complete-guide/"}
+  ],
+  "GraphQL": [
+    {"title": "GraphQL by Example", "type": "course", "provider": "Udemy", "duration": "8 hours", "url": "https://www.udemy.com/course/graphql-by-example/"}
+  ],
+  "Java": [
+    {"title": "Java Programming Masterclass", "type": "course", "provider": "Udemy", "duration": "80 hours", "url": "https://www.udemy.com/course/java-the-complete-java-developer-course/"}
+  ],
+  "C++": [
+    {"title": "Beginning C++ Programming", "type": "course", "provider": "Udemy", "duration": "46 hours", "url": "https://www.udemy.com/course/beginning-c-plus-plus-programming/"}
+  ],
+  "Go": [
+    {"title": "Go: The Complete Developer's Guide", "type": "course", "provider": "Udemy", "duration": "9 hours", "url": "https://www.udemy.com/course/go-the-complete-developers-guide/"}
+  ],
+  "Linux": [
+    {"title": "Linux Mastery", "type": "course", "provider": "Udemy", "duration": "12 hours", "url": "https://www.udemy.com/course/linux-mastery/"}
+  ],
+  "Tailwind": [
+    {"title": "Tailwind CSS From Scratch", "type": "course", "provider": "Udemy", "duration": "12 hours", "url": "https://www.udemy.com/course/tailwind-css-from-scratch/"}
+  ],
+  "Express": [
+    {"title": "Just Express", "type": "course", "provider": "Udemy", "duration": "6 hours", "url": "https://www.udemy.com/course/just-express-with-a-bunch-of-node-and-http-in-detail/"}
+  ],
+  "Spring": [
+    {"title": "Spring Framework 6", "type": "course", "provider": "Udemy", "duration": "50 hours", "url": "https://www.udemy.com/course/spring-hibernate-tutorial/"}
+  ],
+  "Rust": [
+    {"title": "The Rust Programming Language", "type": "course", "provider": "Udemy", "duration": "15 hours", "url": "https://www.udemy.com/course/rust-lang/"}
+  ]
+}
