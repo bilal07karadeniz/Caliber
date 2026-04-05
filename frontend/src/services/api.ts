@@ -53,6 +53,11 @@ export const authApi = {
   logout: () => api.post('/auth/logout'),
   refresh: () => api.post('/auth/refresh'),
   getMe: () => api.get('/auth/me'),
+  verifyEmail: (token: string) => api.post('/auth/verify-email', { token }),
+  resendVerification: (email: string) => api.post('/auth/resend-verification', { email }),
+  forgotPassword: (email: string) => api.post('/auth/forgot-password', { email }),
+  resetPassword: (data: { token: string; password: string }) => api.post('/auth/reset-password', data),
+  verifyEmailChange: (token: string) => api.post('/auth/verify-email-change', { token }),
 };
 
 // Users
@@ -67,6 +72,8 @@ export const userApi = {
   },
   getAllUsers: (params?: any) => api.get('/users', { params }),
   toggleActive: (id: string) => api.patch(`/users/${id}/toggle-active`),
+  changePassword: (data: { currentPassword: string; newPassword: string }) => api.post('/users/me/change-password', data),
+  changeEmail: (data: { newEmail: string; password: string }) => api.post('/users/me/change-email', data),
 };
 
 // Companies

@@ -27,7 +27,17 @@ export default function Register() {
 
   const onSubmit = async (data: FormData) => {
     setLoading(true);
-    try { await registerUser(data.name, data.email, data.password, data.role); toast.success('Account created'); navigate('/dashboard'); }
+    try {
+      await registerUser(data.name, data.email, data.password, data.role);
+      const { user } = useAuthStore.getState();
+      if (user?.emailVerified === false) {
+        toast.success('Account created! Check your email to verify your account.');
+        navigate('/login');
+      } else {
+        toast.success('Account created');
+        navigate('/dashboard');
+      }
+    }
     catch (err: any) { toast.error(err.response?.data?.message || 'Registration failed'); }
     finally { setLoading(false); }
   };

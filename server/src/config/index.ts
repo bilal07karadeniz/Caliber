@@ -15,4 +15,6 @@ export const config = {
   emailFrom: process.env.EMAIL_FROM || 'Caliber <onboarding@resend.dev>',
   aiApiKey: process.env.AI_API_KEY || '',
   redisUrl: process.env.REDIS_URL || '',
+  verificationTokenExpiry: 24 * 60 * 60 * 1000, // 24 hours
+  passwordResetTokenExpiry: 60 * 60 * 1000, // 1 hour
 };

@@ -4,6 +4,9 @@ import { hashPassword, comparePassword } from '../utils/password';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { AuthenticatedRequest } from '../types';
 import { sanitizeUser } from '../utils/sanitizeUser';
+import { generateToken, hashToken } from '../utils/verificationToken';
+import { notificationService } from '../services/notification.service';
+import { config } from '../config';
 
 export const register = async (req: Request, res: Response) => {
   try {
@@ -23,6 +26,21 @@ export const register = async (req: Request, res: Response) => {
       await prisma.companyProfile.create({
         data: { userId: user.id, companyName: name + "'s Company" },
       });
+    }
+
+    if (notificationService.isEmailEnabled()) {
+      const token = generateToken();
+      await prisma.verificationToken.create({
+        data: {
+          userId: user.id,
+          token: hashToken(token),
+          type: 'EMAIL_VERIFICATION',
+          expiresAt: new Date(Date.now() + config.verificationTokenExpiry),
+        },
+      });
+      await notificationService.sendVerificationEmail(user.email, user.name, token);
+    } else {
+      await prisma.user.update({ where: { id: user.id }, data: { emailVerified: true } });
     }
 
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
@@ -61,6 +79,10 @@ export const login = async (req: Request, res: Response) => {
 
     if (!user.isActive) {
       return res.status(403).json({ success: false, message: 'Account is deactivated' });
+    }
+
+    if (!user.emailVerified) {
+      return res.status(403).json({ success: false, message: 'Please verify your email before logging in', emailVerified: false });
     }
 
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
@@ -122,6 +144,119 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
 export const logout = async (_req: Request, res: Response) => {
   res.clearCookie('refreshToken');
   return res.json({ success: true, message: 'Logged out' });
+};
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.body;
+    const hashedToken = hashToken(token);
+
+    const verificationToken = await prisma.verificationToken.findFirst({
+      where: { token: hashedToken, type: 'EMAIL_VERIFICATION', expiresAt: { gt: new Date() } },
+    });
+
+    if (!verificationToken) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired verification token' });
+    }
+
+    await prisma.user.update({ where: { id: verificationToken.userId }, data: { emailVerified: true } });
+    await prisma.verificationToken.deleteMany({ where: { userId: verificationToken.userId, type: 'EMAIL_VERIFICATION' } });
+
+    return res.json({ success: true, message: 'Email verified successfully' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Verification failed' });
+  }
+};
+
+export const resendVerificationEmail = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (user && !user.emailVerified && notificationService.isEmailEnabled()) {
+      await prisma.verificationToken.deleteMany({ where: { userId: user.id, type: 'EMAIL_VERIFICATION' } });
+      const token = generateToken();
+      await prisma.verificationToken.create({
+        data: { userId: user.id, token: hashToken(token), type: 'EMAIL_VERIFICATION', expiresAt: new Date(Date.now() + config.verificationTokenExpiry) },
+      });
+      await notificationService.sendVerificationEmail(user.email, user.name, token);
+    }
+
+    return res.json({ success: true, message: 'If that email exists and is unverified, we sent a verification link' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to resend verification' });
+  }
+};
+
+export const forgotPassword = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    const user = await prisma.user.findUnique({ where: { email } });
+
+    if (user && notificationService.isEmailEnabled()) {
+      await prisma.verificationToken.deleteMany({ where: { userId: user.id, type: 'PASSWORD_RESET' } });
+      const token = generateToken();
+      await prisma.verificationToken.create({
+        data: { userId: user.id, token: hashToken(token), type: 'PASSWORD_RESET', expiresAt: new Date(Date.now() + config.passwordResetTokenExpiry) },
+      });
+      await notificationService.sendPasswordResetEmail(user.email, user.name, token);
+    }
+
+    return res.json({ success: true, message: 'If that email exists, we sent a password reset link' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to process request' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { token, password } = req.body;
+    const hashedToken = hashToken(token);
+
+    const verificationToken = await prisma.verificationToken.findFirst({
+      where: { token: hashedToken, type: 'PASSWORD_RESET', expiresAt: { gt: new Date() } },
+    });
+
+    if (!verificationToken) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired reset token' });
+    }
+
+    const hashedPassword = await hashPassword(password);
+    await prisma.user.update({ where: { id: verificationToken.userId }, data: { password: hashedPassword } });
+    await prisma.verificationToken.deleteMany({ where: { userId: verificationToken.userId, type: 'PASSWORD_RESET' } });
+
+    return res.json({ success: true, message: 'Password reset successfully' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to reset password' });
+  }
+};
+
+export const verifyEmailChange = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.body;
+    const hashedToken = hashToken(token);
+
+    const verificationToken = await prisma.verificationToken.findFirst({
+      where: { token: hashedToken, type: 'EMAIL_CHANGE', expiresAt: { gt: new Date() } },
+    });
+
+    if (!verificationToken || !verificationToken.data) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired token' });
+    }
+
+    const { newEmail } = verificationToken.data as any;
+    const existing = await prisma.user.findUnique({ where: { email: newEmail } });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'Email already taken' });
+    }
+
+    await prisma.user.update({ where: { id: verificationToken.userId }, data: { email: newEmail, emailVerified: true } });
+    await prisma.verificationToken.deleteMany({ where: { userId: verificationToken.userId, type: 'EMAIL_CHANGE' } });
+
+    return res.json({ success: true, message: 'Email changed successfully' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to change email' });
+  }
 };
 
 export const getMe = async (req: AuthenticatedRequest, res: Response) => {

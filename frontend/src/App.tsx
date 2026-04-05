@@ -22,6 +22,10 @@ import Recommendations from './pages/Recommendations';
 import SkillGap from './pages/SkillGap';
 import Notifications from './pages/Notifications';
 import NotFound from './pages/NotFound';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
+import VerifyEmail from './pages/VerifyEmail';
+import VerifyEmailChange from './pages/VerifyEmailChange';
 
 // Employer pages
 import MyJobs from './pages/employer/MyJobs';
@@ -72,6 +76,10 @@ function AppContent() {
       <Route path="/jobs/:id" element={<JobDetail />} />
       <Route path="/login" element={<PublicRoute><Login /></PublicRoute>} />
       <Route path="/register" element={<PublicRoute><Register /></PublicRoute>} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+      <Route path="/verify-email" element={<VerifyEmail />} />
+      <Route path="/verify-email-change" element={<VerifyEmailChange />} />
 
       {/* Authenticated routes */}
       <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />

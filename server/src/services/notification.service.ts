@@ -77,6 +77,31 @@ export const notificationService = {
     }
   },
 
+  async sendVerificationEmail(email: string, name: string, token: string) {
+    const verifyUrl = `${config.clientUrl}/verify-email?token=${token}`;
+    await sendEmail(email, 'Verify your email — Caliber',
+      `<h2>Hi ${name},</h2><p>Please verify your email by clicking the link below:</p><p><a href="${verifyUrl}">Verify Email</a></p><p>This link expires in 24 hours.</p>`
+    );
+  },
+
+  async sendPasswordResetEmail(email: string, name: string, token: string) {
+    const resetUrl = `${config.clientUrl}/reset-password?token=${token}`;
+    await sendEmail(email, 'Reset your password — Caliber',
+      `<h2>Hi ${name},</h2><p>Click below to reset your password. This link expires in 1 hour.</p><p><a href="${resetUrl}">Reset Password</a></p><p>If you didn't request this, ignore this email.</p>`
+    );
+  },
+
+  async sendEmailChangeVerification(email: string, name: string, token: string) {
+    const verifyUrl = `${config.clientUrl}/verify-email-change?token=${token}`;
+    await sendEmail(email, 'Confirm your new email — Caliber',
+      `<h2>Hi ${name},</h2><p>You requested to change your email. Click below to confirm:</p><p><a href="${verifyUrl}">Confirm New Email</a></p><p>This link expires in 24 hours.</p>`
+    );
+  },
+
+  isEmailEnabled(): boolean {
+    return !!resend;
+  },
+
   async notifyNewJobMatch(userId: string, job: any, matchScore: number) {
     await this.createNotification(
       userId,

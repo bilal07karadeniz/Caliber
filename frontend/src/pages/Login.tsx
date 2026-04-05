@@ -8,6 +8,7 @@ import AuthLayout from '../layouts/AuthLayout';
 import Input from '../components/ui/Input';
 import Button from '../components/ui/Button';
 import { useAuthStore } from '../store/authStore';
+import { authApi } from '../services/api';
 
 const schema = z.object({
   email: z.string().email('Valid email required'),
@@ -22,11 +23,28 @@ export default function Login() {
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema) });
 
+  const [resending, setResending] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState('');
+
   const onSubmit = async (data: FormData) => {
     setLoading(true);
     try { await login(data.email, data.password); toast.success('Welcome back'); navigate('/dashboard'); }
-    catch (err: any) { toast.error(err.response?.data?.message || 'Login failed'); }
+    catch (err: any) {
+      if (err.response?.data?.data?.emailVerified === false) {
+        setUnverifiedEmail(data.email);
+        toast.error('Please verify your email before logging in');
+      } else {
+        toast.error(err.response?.data?.message || 'Login failed');
+      }
+    }
     finally { setLoading(false); }
+  };
+
+  const handleResend = async () => {
+    setResending(true);
+    try { await authApi.resendVerification(unverifiedEmail); toast.success('Verification email sent'); }
+    catch { toast.error('Failed to resend'); }
+    setResending(false);
   };
 
   return (
@@ -36,8 +54,20 @@ export default function Login() {
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
         <Input label="Email" type="email" {...register('email')} error={errors.email?.message} placeholder="you@example.com" />
         <Input label="Password" type="password" {...register('password')} error={errors.password?.message} placeholder="••••••••" />
+        <div className="flex justify-end">
+          <Link to="/forgot-password" className="text-sm text-verdant-600 hover:underline underline-offset-4">Forgot password?</Link>
+        </div>
         <Button type="submit" className="w-full" size="lg" isLoading={loading}>Sign In</Button>
       </form>
+      {unverifiedEmail && (
+        <div className="mt-4 p-3 border border-amber-300 bg-amber-50 rounded-md text-sm text-ink-700">
+          <p>Your email is not verified. Check your inbox or{' '}
+            <button onClick={handleResend} disabled={resending} className="text-verdant-600 hover:underline underline-offset-4 font-medium">
+              {resending ? 'Sending...' : 'resend verification email'}
+            </button>.
+          </p>
+        </div>
+      )}
       <p className="text-sm text-ink-500 mt-6">
         No account? <Link to="/register" className="text-verdant-600 hover:underline underline-offset-4 font-medium">Register</Link>
       </p>

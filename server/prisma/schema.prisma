@@ -29,6 +29,12 @@ enum ApplicationStatus {
   ACCEPTED
 }
 
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  EMAIL_CHANGE
+}
+
 enum NotificationType {
   APPLICATION_UPDATE
   NEW_JOB_MATCH
@@ -47,17 +53,19 @@ model User {
   location  String?
   bio       String?
   avatar    String?
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  isActive      Boolean  @default(true)
+  emailVerified Boolean  @default(false)
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
-  jobs            Job[]
-  applications    Application[]
-  resumes         Resume[]
-  recommendations AiRecommendation[]
-  userSkills      UserSkill[]
-  companyProfile  CompanyProfile?
-  notifications   Notification[]
+  jobs               Job[]
+  applications       Application[]
+  resumes            Resume[]
+  recommendations    AiRecommendation[]
+  userSkills         UserSkill[]
+  companyProfile     CompanyProfile?
+  notifications      Notification[]
+  verificationTokens VerificationToken[]
 
   @@map("users")
 }
@@ -214,4 +222,21 @@ model Notification {
   @@index([isRead])
   @@index([createdAt])
   @@map("notifications")
+}
+
+model VerificationToken {
+  id        String    @id @default(uuid())
+  userId    String
+  token     String    @unique
+  type      TokenType
+  expiresAt DateTime
+  data      Json?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@index([expiresAt])
+  @@map("verification_tokens")
 }

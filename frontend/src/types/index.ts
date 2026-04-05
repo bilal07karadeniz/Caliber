@@ -7,6 +7,7 @@ export interface User {
   location?: string;
   bio?: string;
   avatar?: string;
+  emailVerified?: boolean;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

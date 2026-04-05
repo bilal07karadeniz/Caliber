@@ -2,6 +2,10 @@ import { Request, Response } from 'express';
 import prisma from '../config/database';
 import { AuthenticatedRequest } from '../types';
 import { sanitizeUser } from '../utils/sanitizeUser';
+import { comparePassword, hashPassword } from '../utils/password';
+import { generateToken, hashToken } from '../utils/verificationToken';
+import { notificationService } from '../services/notification.service';
+import { config } from '../config';
 
 export const getProfile = async (req: AuthenticatedRequest, res: Response) => {
   try {
@@ -140,6 +144,53 @@ export const toggleUserActive = async (req: AuthenticatedRequest, res: Response)
   } catch (error) {
     console.error('ToggleActive error:', error);
     return res.status(500).json({ success: false, message: 'Failed to toggle user status' });
+  }
+};
+
+export const changePassword = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await prisma.user.findUnique({ where: { id: req.user!.userId } });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const valid = await comparePassword(currentPassword, user.password);
+    if (!valid) return res.status(400).json({ success: false, message: 'Current password is incorrect' });
+
+    const hashed = await hashPassword(newPassword);
+    await prisma.user.update({ where: { id: user.id }, data: { password: hashed } });
+
+    return res.json({ success: true, message: 'Password changed successfully' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to change password' });
+  }
+};
+
+export const changeEmail = async (req: AuthenticatedRequest, res: Response) => {
+  try {
+    const { newEmail, password } = req.body;
+    const user = await prisma.user.findUnique({ where: { id: req.user!.userId } });
+    if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+    const valid = await comparePassword(password, user.password);
+    if (!valid) return res.status(400).json({ success: false, message: 'Password is incorrect' });
+
+    const existing = await prisma.user.findUnique({ where: { email: newEmail } });
+    if (existing) return res.status(400).json({ success: false, message: 'Email already taken' });
+
+    if (notificationService.isEmailEnabled()) {
+      await prisma.verificationToken.deleteMany({ where: { userId: user.id, type: 'EMAIL_CHANGE' } });
+      const token = generateToken();
+      await prisma.verificationToken.create({
+        data: { userId: user.id, token: hashToken(token), type: 'EMAIL_CHANGE', expiresAt: new Date(Date.now() + config.verificationTokenExpiry), data: { newEmail } },
+      });
+      await notificationService.sendEmailChangeVerification(newEmail, user.name, token);
+      return res.json({ success: true, message: 'Verification email sent to your new address' });
+    } else {
+      await prisma.user.update({ where: { id: user.id }, data: { email: newEmail } });
+      return res.json({ success: true, message: 'Email changed successfully' });
+    }
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Failed to change email' });
   }
 };
 
