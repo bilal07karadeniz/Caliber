@@ -17,3 +17,10 @@ uploads/
 *.swo
 .prisma/
 coverage/
+*.env.production.*
+.env.*
+!.env.example
+!.env.production.example
+sentence_transformers/
+.cache/
+huggingface/

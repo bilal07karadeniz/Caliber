@@ -8,6 +8,7 @@ import EmptyState from '../components/ui/EmptyState';
 import { notificationApi } from '../services/api';
 import { useNotificationStore } from '../store/notificationStore';
 import { Bell, Check, Trash2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import type { Notification } from '../types';
 
 const typeIcons: Record<string, string> = {
@@ -30,20 +31,35 @@ export default function Notifications() {
   };
 
   const handleMarkAllRead = async () => {
-    await notificationApi.markAllRead();
-    setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
-    setUnreadCount(0);
+    try {
+      await notificationApi.markAllRead();
+      setNotifications(notifications.map((n) => ({ ...n, isRead: true })));
+      setUnreadCount(0);
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to mark notifications as read');
+    }
   };
 
   const handleMarkRead = async (id: string) => {
-    await notificationApi.markRead(id);
-    setNotifications(notifications.map((n) => n.id === id ? { ...n, isRead: true } : n));
-    setUnreadCount(Math.max(0, notifications.filter((n) => !n.isRead).length - 1));
+    try {
+      await notificationApi.markRead(id);
+      setNotifications(notifications.map((n) => n.id === id ? { ...n, isRead: true } : n));
+      setUnreadCount(Math.max(0, notifications.filter((n) => !n.isRead).length - 1));
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to mark notification as read');
+    }
   };
 
   const handleDelete = async (id: string) => {
-    await notificationApi.delete(id);
-    setNotifications(notifications.filter((n) => n.id !== id));
+    try {
+      await notificationApi.delete(id);
+      setNotifications(notifications.filter((n) => n.id !== id));
+    } catch (e) {
+      console.error(e);
+      toast.error('Failed to delete notification');
+    }
   };
 
   if (loading) return <DashboardLayout><div className="flex justify-center py-20"><Spinner size="lg" /></div></DashboardLayout>;

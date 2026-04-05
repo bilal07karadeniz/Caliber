@@ -4,6 +4,7 @@ import { config } from '../config';
 const aiClient = axios.create({
   baseURL: config.aiServiceUrl,
   timeout: 30000,
+  headers: config.aiApiKey ? { 'X-API-Key': config.aiApiKey } : {},
 });
 
 export const aiEngineService = {

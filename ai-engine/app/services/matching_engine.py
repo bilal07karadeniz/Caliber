@@ -6,6 +6,14 @@ from app.ml.embeddings import embedding_service
 from app.ml.skill_matcher import skill_matcher
 
 
+DEGREE_KEYWORDS = {
+    "phd": 4, "ph.d": 4, "doctorate": 4,
+    "master": 3, "m.sc": 3, "m.a": 3, "mba": 3, "m.s.": 3,
+    "bachelor": 2, "b.sc": 2, "b.a": 2, "b.s.": 2, "undergraduate": 2,
+    "associate": 1, "diploma": 1, "certificate": 1,
+}
+
+
 class MatchingEngine:
     async def _get_user_skills(self, db: AsyncSession, user_id: str) -> list[dict]:
         result = await db.execute(
@@ -29,6 +37,69 @@ class MatchingEngine:
         )
         resume = result.scalar_one_or_none()
         return resume.extractedText or "" if resume else ""
+
+    async def _get_user_resume_parsed(self, db: AsyncSession, user_id: str) -> dict:
+        result = await db.execute(
+            select(Resume).where(Resume.userId == user_id, Resume.isActive == True).limit(1)
+        )
+        resume = result.scalar_one_or_none()
+        if resume and resume.parsedData and isinstance(resume.parsedData, dict):
+            return resume.parsedData
+        return {}
+
+    def _compute_education_score(self, parsed_data: dict, job_requirements: str) -> float:
+        """Fix 5: Real education scoring instead of hardcoded 0.5."""
+        education = parsed_data.get("education", [])
+        if not education:
+            return 0.3  # No education data
+
+        requirements_lower = (job_requirements or "").lower()
+
+        # Check if job mentions specific degree requirements
+        required_level = 0
+        for keyword, level in DEGREE_KEYWORDS.items():
+            if keyword in requirements_lower:
+                required_level = max(required_level, level)
+
+        if required_level == 0:
+            # Job doesn't require specific education
+            return 1.0
+
+        # Check user's education level
+        user_level = 0
+        for edu in education:
+            edu_text = " ".join([
+                edu.get("institution", ""),
+                edu.get("degree", ""),
+                edu.get("field", ""),
+            ]).lower()
+            for keyword, level in DEGREE_KEYWORDS.items():
+                if keyword in edu_text:
+                    user_level = max(user_level, level)
+
+        if user_level >= required_level:
+            return 1.0
+        elif user_level > 0:
+            return 0.7
+        else:
+            return 0.3
+
+    def _compute_salary_score(self, job) -> float:
+        """Fix 6: Real salary scoring instead of hardcoded 0.7."""
+        salary_min = job.salaryMin
+        salary_max = job.salaryMax
+
+        if salary_min is None and salary_max is None:
+            return 0.7  # No salary info, neutral
+
+        effective_salary = salary_max or salary_min or 0
+        if effective_salary <= 0:
+            return 0.7
+
+        if effective_salary >= 50000:
+            return 0.9  # Competitive salary
+        else:
+            return 0.8  # Has salary but lower range
 
     async def compute_match_score(self, db: AsyncSession, user_id: str, job_id: str) -> dict:
         user_skills = await self._get_user_skills(db, user_id)
@@ -55,8 +126,9 @@ class MatchingEngine:
             if user_vec is not None and job_vec is not None:
                 exp_score = max(0, embedding_service.cosine_similarity(user_vec, job_vec))
 
-        # 3. Education Match (15%)
-        edu_score = 0.5
+        # 3. Education Match (15%) - Fix 5
+        parsed_data = await self._get_user_resume_parsed(db, user_id)
+        edu_score = self._compute_education_score(parsed_data, job.requirements)
 
         # 4. Location Match (10%)
         loc_score = 0.5
@@ -69,8 +141,8 @@ class MatchingEngine:
                 elif any(part in job.location.lower() for part in user.location.lower().split()):
                     loc_score = 0.7
 
-        # 5. Salary Fit (10%)
-        salary_score = 0.7
+        # 5. Salary Fit (10%) - Fix 6
+        salary_score = self._compute_salary_score(job)
 
         # Weighted sum
         final_score = (
@@ -120,6 +192,11 @@ class MatchingEngine:
     async def match_user_to_jobs(self, db: AsyncSession, user_id: str, limit: int = 20) -> list[dict]:
         result = await db.execute(select(Job).where(Job.isActive == True))
         jobs = result.scalars().all()
+
+        # Fix 8: Delete existing recommendations before inserting new ones
+        await db.execute(
+            AiRecommendation.__table__.delete().where(AiRecommendation.userId == user_id)
+        )
 
         matches = []
         for job in jobs:

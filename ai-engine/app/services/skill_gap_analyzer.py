@@ -1,8 +1,9 @@
 import json
 import os
-from sqlalchemy import select
+import re
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.models import UserSkill, JobSkill, Skill, AiRecommendation
+from app.models import UserSkill, JobSkill, Skill, AiRecommendation, Job
 
 
 LEARNING_RESOURCES_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "data", "learning_resources.json")
@@ -14,6 +15,14 @@ def _load_resources() -> dict:
             return json.load(f)
     except Exception:
         return {}
+
+
+def _parse_duration_hours(duration_str: str) -> float:
+    """Parse a duration string like '20 hours' into a float."""
+    match = re.search(r"(\d+(?:\.\d+)?)", str(duration_str))
+    if match:
+        return float(match.group(1))
+    return 15.0  # fallback
 
 
 class SkillGapAnalyzer:
@@ -125,10 +134,9 @@ class SkillGapAnalyzer:
 
         recommended_paths = [path_map.get(area, f"{area} Specialist") for area in strongest_areas]
 
-        # Suggest next skills
+        # Fix 13: Derive next_skills dynamically from DB instead of hardcoded list
         all_user_skills = {s.lower() for s, _, _ in skills}
-        suggested = ["Docker", "Kubernetes", "AWS", "TypeScript", "Python", "React", "Machine Learning"]
-        next_skills = [s for s in suggested if s.lower() not in all_user_skills][:5]
+        next_skills = await self._get_dynamic_next_skills(db, all_user_skills, strongest_areas)
 
         return {
             "user_id": user_id,
@@ -137,6 +145,33 @@ class SkillGapAnalyzer:
             "next_skills": next_skills,
             "summary": f"Based on your skills, you're strongest in {', '.join(strongest_areas)}. Consider exploring {', '.join(recommended_paths)} career paths.",
         }
+
+    async def _get_dynamic_next_skills(self, db: AsyncSession, user_skills: set[str], strongest_areas: list[str]) -> list[str]:
+        """Fix 13: Get skill suggestions based on what's most common in job listings that the user doesn't have."""
+        # Find the most in-demand skills from jobs in the database
+        result = await db.execute(
+            select(Skill.name, func.count(JobSkill.jobId).label("job_count"))
+            .join(JobSkill, Skill.id == JobSkill.skillId)
+            .group_by(Skill.name)
+            .order_by(func.count(JobSkill.jobId).desc())
+            .limit(30)
+        )
+        popular_skills = result.all()
+
+        # Filter out skills the user already has
+        next_skills = []
+        for skill_name, _ in popular_skills:
+            if skill_name.lower() not in user_skills:
+                next_skills.append(skill_name)
+            if len(next_skills) >= 5:
+                break
+
+        # Fallback if DB has no job skills
+        if not next_skills:
+            fallback = ["Docker", "Kubernetes", "AWS", "TypeScript", "Python", "React", "Machine Learning"]
+            next_skills = [s for s in fallback if s.lower() not in user_skills][:5]
+
+        return next_skills
 
     async def get_learning_path(self, db: AsyncSession, user_id: str) -> dict:
         # Get all recommendation gaps for this user
@@ -160,10 +195,15 @@ class SkillGapAnalyzer:
 
         courses = self._get_recommendations(gap_list)
 
+        # Fix 14: Use actual resource durations instead of len(courses) * 15
+        total_hours = 0.0
+        for course in courses:
+            total_hours += _parse_duration_hours(course.get("estimated_duration", "15 hours"))
+
         return {
             "user_id": user_id,
             "courses": courses,
-            "estimated_total_hours": f"{len(courses) * 15} hours",
+            "estimated_total_hours": f"{total_hours:.0f} hours",
         }
 
 

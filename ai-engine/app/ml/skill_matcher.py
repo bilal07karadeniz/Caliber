@@ -2,6 +2,16 @@ from app.ml.embeddings import embedding_service
 
 
 class SkillMatcher:
+    def __init__(self):
+        # Fix 18: Cache skill name embeddings to avoid recomputing
+        self._embedding_cache: dict = {}
+
+    def _get_cached_embedding(self, text: str):
+        """Get embedding from cache or compute and cache it."""
+        if text not in self._embedding_cache:
+            self._embedding_cache[text] = embedding_service.encode_text(text)
+        return self._embedding_cache[text]
+
     def compute_skill_overlap(self, user_skills: list[dict], job_skills: list[dict]) -> float:
         if not job_skills:
             return 1.0
@@ -23,12 +33,11 @@ class SkillMatcher:
                 ratio = min(user_level / max(req_level, 1), 1.0)
                 matched_weight += req_level * ratio
             else:
-                # Try semantic match
+                # Try semantic match using cached embeddings
                 best_sim = 0.0
-                user_vec = None
-                job_vec = embedding_service.encode_text(req_name)
+                job_vec = self._get_cached_embedding(req_name)
                 for uname in user_skill_map:
-                    uv = embedding_service.encode_text(uname)
+                    uv = self._get_cached_embedding(uname)
                     if uv is not None and job_vec is not None:
                         sim = embedding_service.cosine_similarity(uv, job_vec)
                         if sim > best_sim:

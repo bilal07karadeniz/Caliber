@@ -92,7 +92,7 @@ export const deleteResume = async (req: AuthenticatedRequest, res: Response) => 
     if (!resume) return res.status(404).json({ success: false, message: 'Resume not found' });
 
     // Delete file from disk
-    const fullPath = path.resolve(config.uploadDir, resume.filePath.replace('/uploads/', ''));
+    const fullPath = path.resolve('.' + resume.filePath);
     if (fs.existsSync(fullPath)) fs.unlinkSync(fullPath);
 
     await prisma.resume.delete({ where: { id: req.params.id } });
@@ -112,7 +112,11 @@ export const downloadResume = async (req: AuthenticatedRequest, res: Response) =
       return res.status(403).json({ success: false, message: 'Not authorized' });
     }
 
+    const uploadsBase = path.resolve('./uploads');
     const fullPath = path.resolve('.' + resume.filePath);
+    if (!fullPath.startsWith(uploadsBase)) {
+      return res.status(400).json({ success: false, message: 'Invalid file path' });
+    }
     if (!fs.existsSync(fullPath)) {
       return res.status(404).json({ success: false, message: 'File not found' });
     }

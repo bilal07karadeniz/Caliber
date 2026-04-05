@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Bell, LogOut, User, Briefcase } from 'lucide-react';
 import { useAuthStore } from '../../store/authStore';
@@ -11,6 +11,17 @@ export default function Navbar() {
   const { user, isAuthenticated, logout } = useAuthStore();
   const { unreadCount } = useNotificationStore();
   const navigate = useNavigate();
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+    if (dropdownOpen) document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [dropdownOpen]);
 
   const handleLogout = async () => {
     await logout();
@@ -44,7 +55,7 @@ export default function Navbar() {
                     </span>
                   )}
                 </Link>
-                <div className="relative">
+                <div className="relative" ref={dropdownRef}>
                   <button onClick={() => setDropdownOpen(!dropdownOpen)} className="flex items-center">
                     <Avatar name={user?.name || ''} src={user?.avatar || undefined} size="sm" />
                   </button>

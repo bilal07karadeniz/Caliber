@@ -43,7 +43,7 @@ export default function Landing() {
                 {Array.from({ length: 64 }).map((_, i) => (
                   <div key={i} className="aspect-square rounded-sm" style={{
                     backgroundColor: '#2D8A3E',
-                    opacity: Math.random() * 0.6 + 0.05,
+                    opacity: ((i * 7 + 3) % 13) / 20 + 0.05,
                   }} />
                 ))}
               </div>
@@ -94,9 +94,9 @@ export default function Landing() {
       <section className="border-y border-ink-200 bg-surface-raised">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="data-wall">
-            <div><p className="label mb-1">Job Postings</p><p className="data-value">10,000+</p></div>
-            <div><p className="label mb-1">Candidates</p><p className="data-value">5,000+</p></div>
-            <div><p className="label mb-1">Match Accuracy</p><p className="data-value">95%</p></div>
+            <div><p className="label mb-1">AI-Powered</p><p className="data-value">5-Factor</p></div>
+            <div><p className="label mb-1">Matching Engine</p><p className="data-value">NLP</p></div>
+            <div><p className="label mb-1">Skill Analysis</p><p className="data-value">Real-time</p></div>
           </div>
         </div>
       </section>

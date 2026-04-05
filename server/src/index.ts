@@ -7,20 +7,39 @@ import { config } from './config';
 import prisma from './config/database';
 import routes from './routes';
 import { generalLimiter } from './middleware/rateLimiter';
+import { sanitize } from './middleware/sanitize';
+import { setupSwagger } from './config/swagger';
 
 const app = express();
 
 // Middleware
+const allowedOrigins = (config.clientUrl || '').split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({
-  origin: config.clientUrl,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
-app.use(helmet({ contentSecurityPolicy: false }));
-app.use(morgan('dev'));
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      imgSrc: ["'self'", "data:", "blob:"],
+      connectSrc: ["'self'"],
+    },
+  },
+}));
+app.use(morgan(process.env.NODE_ENV === 'production' ? 'combined' : 'dev'));
 app.use(cookieParser());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(config.uploadDir));
+app.use(sanitize);
 app.use(generalLimiter);
 
 // Health check
@@ -30,6 +49,9 @@ app.get('/api/health', (_req, res) => {
 
 // API Routes
 app.use('/api', routes);
+
+// Swagger docs
+setupSwagger(app);
 
 // 404 handler
 app.use('/api/*', (_req, res) => {

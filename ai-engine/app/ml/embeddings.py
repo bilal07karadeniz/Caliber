@@ -1,5 +1,8 @@
+import logging
 import numpy as np
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 _model = None
 
@@ -10,13 +13,19 @@ def _get_model():
         try:
             from sentence_transformers import SentenceTransformer
             _model = SentenceTransformer("all-MiniLM-L6-v2")
+            logger.info("Sentence-transformers model loaded successfully")
         except Exception as e:
-            print(f"Warning: Could not load sentence-transformers model: {e}")
+            logger.warning("Could not load sentence-transformers model: %s", e)
             _model = "unavailable"
     return _model
 
 
 class EmbeddingService:
+    @property
+    def is_available(self) -> bool:
+        model = _get_model()
+        return model is not None and model != "unavailable"
+
     def encode_text(self, text: str) -> Optional[np.ndarray]:
         model = _get_model()
         if model == "unavailable" or model is None:

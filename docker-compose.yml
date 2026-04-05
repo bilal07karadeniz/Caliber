@@ -1,19 +1,23 @@
-version: '3.8'
-
 services:
   postgres:
     image: postgres:16
     container_name: caliber-db
     environment:
-      POSTGRES_DB: caliber
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: ${POSTGRES_DB:-caliber}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
       - caliber-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   redis:
     image: redis:7
@@ -22,6 +26,12 @@ services:
       - "6379:6379"
     networks:
       - caliber-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   server:
     build: ./server
@@ -29,20 +39,29 @@ services:
     ports:
       - "3001:3001"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/caliber
-      JWT_SECRET: dev-jwt-secret
-      JWT_REFRESH_SECRET: dev-jwt-refresh-secret
+      NODE_ENV: ${NODE_ENV:-development}
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-caliber}
+      JWT_SECRET: ${JWT_SECRET:-dev-jwt-secret}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-dev-jwt-refresh-secret}
       AI_SERVICE_URL: http://ai-engine:8000
-      CLIENT_URL: http://localhost:5173
+      AI_API_KEY: ${AI_API_KEY:-}
+      CLIENT_URL: ${CLIENT_URL:-http://localhost:5173}
+      REDIS_URL: redis://redis:6379
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      EMAIL_FROM: ${EMAIL_FROM:-Caliber <onboarding@resend.dev>}
+      UPLOAD_DIR: /app/uploads
       PORT: 3001
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     volumes:
       - ./server/src:/app/src
       - ./uploads:/app/uploads
     networks:
       - caliber-network
+    restart: unless-stopped
 
   ai-engine:
     build: ./ai-engine
@@ -50,30 +69,35 @@ services:
     ports:
       - "8000:8000"
     environment:
-      DATABASE_URL: postgresql://postgres:postgres@postgres:5432/caliber
-      SPACY_MODEL: en_core_web_md
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-caliber}
+      ASYNC_DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-caliber}
+      SPACY_MODEL: en_core_web_sm
+      API_KEY: ${AI_API_KEY:-}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173,http://localhost:3001}
+      UPLOADS_DIR: /app/uploads
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     volumes:
       - ./ai-engine/app:/app/app
       - ./uploads:/app/uploads
     networks:
       - caliber-network
+    restart: unless-stopped
 
   client:
-    build: ./client
+    build:
+      context: ./client
+      args:
+        VITE_API_URL: ${VITE_API_URL:-/api}
     container_name: caliber-client
     ports:
-      - "5173:5173"
-    environment:
-      VITE_API_URL: http://localhost:3001/api
-      VITE_AI_SERVICE_URL: http://localhost:8000
+      - "5173:80"
     depends_on:
       - server
-    volumes:
-      - ./client/src:/app/src
     networks:
       - caliber-network
+    restart: unless-stopped
 
 volumes:
   postgres_data:

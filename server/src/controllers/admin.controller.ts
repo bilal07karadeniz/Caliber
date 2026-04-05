@@ -69,11 +69,12 @@ export const getUserActivity = async (req: AuthenticatedRequest, res: Response) 
   try {
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
+    const skip = (page - 1) * limit;
 
     const [recentUsers, recentJobs, recentApplications] = await Promise.all([
-      prisma.user.findMany({ orderBy: { createdAt: 'desc' }, take: limit, select: { id: true, name: true, role: true, createdAt: true } }),
-      prisma.job.findMany({ orderBy: { createdAt: 'desc' }, take: limit, select: { id: true, title: true, createdAt: true } }),
-      prisma.application.findMany({ orderBy: { appliedAt: 'desc' }, take: limit, include: { user: { select: { name: true } }, job: { select: { title: true } } } }),
+      prisma.user.findMany({ orderBy: { createdAt: 'desc' }, skip, take: limit, select: { id: true, name: true, role: true, createdAt: true } }),
+      prisma.job.findMany({ orderBy: { createdAt: 'desc' }, skip, take: limit, select: { id: true, title: true, createdAt: true } }),
+      prisma.application.findMany({ orderBy: { appliedAt: 'desc' }, skip, take: limit, include: { user: { select: { name: true } }, job: { select: { title: true } } } }),
     ]);
 
     return res.json({ success: true, data: { recentUsers, recentJobs, recentApplications } });
@@ -109,7 +110,12 @@ export const manageJob = async (req: AuthenticatedRequest, res: Response) => {
     } else if (action === 'deactivate') {
       await prisma.job.update({ where: { id: jobId }, data: { isActive: false } });
     } else if (action === 'delete') {
-      await prisma.job.delete({ where: { id: jobId } });
+      await prisma.$transaction([
+        prisma.aiRecommendation.deleteMany({ where: { jobId } }),
+        prisma.application.deleteMany({ where: { jobId } }),
+        prisma.jobSkill.deleteMany({ where: { jobId } }),
+        prisma.job.delete({ where: { id: jobId } }),
+      ]);
     } else {
       return res.status(400).json({ success: false, message: 'Invalid action' });
     }

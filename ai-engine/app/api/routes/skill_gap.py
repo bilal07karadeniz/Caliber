@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends
+from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.services.skill_gap_analyzer import skill_gap_analyzer
@@ -6,15 +7,24 @@ from app.services.skill_gap_analyzer import skill_gap_analyzer
 router = APIRouter()
 
 
+class SkillGapRequest(BaseModel):
+    user_id: str
+    job_id: str
+
+
+class CareerInsightsRequest(BaseModel):
+    user_id: str
+
+
 @router.post("/skill-gap/analyze")
-async def analyze_skill_gap(request: dict, db: AsyncSession = Depends(get_db)):
-    result = await skill_gap_analyzer.analyze_gap(db, request["user_id"], request["job_id"])
+async def analyze_skill_gap(request: SkillGapRequest, db: AsyncSession = Depends(get_db)):
+    result = await skill_gap_analyzer.analyze_gap(db, request.user_id, request.job_id)
     return result
 
 
 @router.post("/skill-gap/career-insights")
-async def career_insights(request: dict, db: AsyncSession = Depends(get_db)):
-    result = await skill_gap_analyzer.get_career_insights(db, request["user_id"])
+async def career_insights(request: CareerInsightsRequest, db: AsyncSession = Depends(get_db)):
+    result = await skill_gap_analyzer.get_career_insights(db, request.user_id)
     return result
 
 

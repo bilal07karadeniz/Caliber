@@ -93,7 +93,6 @@ function AppContent() {
       <Route path="/admin" element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/users" element={<ProtectedRoute allowedRoles={['ADMIN']}><UserManagement /></ProtectedRoute>} />
       <Route path="/admin/jobs" element={<ProtectedRoute allowedRoles={['ADMIN']}><JobManagement /></ProtectedRoute>} />
-      <Route path="/admin/system" element={<ProtectedRoute allowedRoles={['ADMIN']}><AdminDashboard /></ProtectedRoute>} />
 
       {/* 404 */}
       <Route path="*" element={<NotFound />} />

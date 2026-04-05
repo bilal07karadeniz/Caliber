@@ -1,6 +1,6 @@
 import { Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store/authStore';
-import { LayoutDashboard, Sparkles, FileText, BarChart3, User, Briefcase, PlusCircle, Users, Activity } from 'lucide-react';
+import { LayoutDashboard, Sparkles, FileText, BarChart3, User, Briefcase, PlusCircle, Users } from 'lucide-react';
 import { clsx } from 'clsx';
 
 const seekerLinks = [
@@ -22,7 +22,6 @@ const adminLinks = [
   { to: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { to: '/admin/users', label: 'Users', icon: Users },
   { to: '/admin/jobs', label: 'Jobs', icon: Briefcase },
-  { to: '/admin/system', label: 'System', icon: Activity },
 ];
 
 export default function Sidebar() {

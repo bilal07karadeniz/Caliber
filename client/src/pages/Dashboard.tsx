@@ -36,6 +36,20 @@ export default function Dashboard() {
     setLoading(false);
   };
 
+  const profileScore = (() => {
+    if (!user) return 0;
+    let score = 0;
+    let total = 0;
+    const check = (val: any) => { total++; if (val) score++; };
+    check(user.name);
+    check(user.phone);
+    check(user.location);
+    check(user.bio);
+    check(user.avatar);
+    check(user.userSkills?.length);
+    return total > 0 ? Math.round((score / total) * 100) : 0;
+  })();
+
   if (loading) return <DashboardLayout><div className="flex justify-center py-20"><Spinner size="lg" /></div></DashboardLayout>;
 
   return (
@@ -64,7 +78,7 @@ export default function Dashboard() {
               </div>
               <div>
                 <p className="label mb-1">Profile Score</p>
-                <p className="data-value">--</p>
+                <p className="data-value">{profileScore}%</p>
               </div>
             </div>
           </div>
