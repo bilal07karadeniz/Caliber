@@ -25,9 +25,13 @@ export default function Profile() {
   const [newPassword, setNewPassword] = useState('');
   const [confirmNewPassword, setConfirmNewPassword] = useState('');
   const [passwordLoading, setPasswordLoading] = useState(false);
+  const [passwordStep, setPasswordStep] = useState<'form' | 'otp'>('form');
+  const [passwordOtpCode, setPasswordOtpCode] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [emailPassword, setEmailPassword] = useState('');
   const [emailLoading, setEmailLoading] = useState(false);
+  const [emailStep, setEmailStep] = useState<'form' | 'otp'>('form');
+  const [emailOtpCode, setEmailOtpCode] = useState('');
 
   const { register, handleSubmit, reset } = useForm();
   const companyForm = useForm();
@@ -100,27 +104,62 @@ export default function Profile() {
     setUploading(false);
   };
 
-  const handleChangePassword = async (e: React.FormEvent) => {
+  const handleRequestPasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordLoading(true);
+    try {
+      const { data: res } = await userApi.requestPasswordChange({ currentPassword });
+      if (res.requiresOTP) {
+        setPasswordStep('otp');
+        toast.success('Verification code sent to your email');
+      } else {
+        // No OTP required, show new password fields directly
+        setPasswordStep('otp');
+      }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to verify password'); }
+    setPasswordLoading(false);
+  };
+
+  const handleConfirmPasswordChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (newPassword !== confirmNewPassword) { toast.error('Passwords do not match'); return; }
     if (newPassword.length < 8) { toast.error('Password must be at least 8 characters'); return; }
     setPasswordLoading(true);
     try {
-      await userApi.changePassword({ currentPassword, newPassword });
+      await userApi.confirmPasswordChange({ code: passwordOtpCode || undefined, newPassword });
       toast.success('Password changed successfully');
-      setCurrentPassword(''); setNewPassword(''); setConfirmNewPassword('');
+      setCurrentPassword(''); setNewPassword(''); setConfirmNewPassword(''); setPasswordOtpCode(''); setPasswordStep('form');
     } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to change password'); }
     setPasswordLoading(false);
   };
 
-  const handleChangeEmail = async (e: React.FormEvent) => {
+  const handleRequestEmailChange = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newEmail || !emailPassword) { toast.error('All fields are required'); return; }
     setEmailLoading(true);
     try {
-      await userApi.changeEmail({ newEmail, password: emailPassword });
-      toast.success('Verification email sent to your new address');
-      setNewEmail(''); setEmailPassword('');
+      const { data: res } = await userApi.requestEmailChange({ newEmail, password: emailPassword });
+      if (res.requiresOTP) {
+        setEmailStep('otp');
+        toast.success('Verification code sent to your new email');
+      } else {
+        toast.success('Email changed successfully');
+        setNewEmail(''); setEmailPassword('');
+        await fetchMe();
+      }
+    } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to change email'); }
+    setEmailLoading(false);
+  };
+
+  const handleConfirmEmailChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (emailOtpCode.length !== 6) { toast.error('Please enter a 6-digit code'); return; }
+    setEmailLoading(true);
+    try {
+      await userApi.confirmEmailChange({ code: emailOtpCode });
+      toast.success('Email changed successfully');
+      setNewEmail(''); setEmailPassword(''); setEmailOtpCode(''); setEmailStep('form');
+      await fetchMe();
     } catch (err: any) { toast.error(err.response?.data?.message || 'Failed to change email'); }
     setEmailLoading(false);
   };
@@ -236,21 +275,57 @@ export default function Profile() {
         <div className="space-y-6">
           <Card>
             <h3 className="font-heading text-lg font-semibold text-ink-900 mb-4">Change Password</h3>
-            <form onSubmit={handleChangePassword} className="space-y-4 max-w-lg">
-              <Input label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="••••••••" required />
-              <Input label="New Password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 8 chars, upper + lower + number" required />
-              <Input label="Confirm New Password" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder="••••••••" required />
-              <Button type="submit" isLoading={passwordLoading}>Update Password</Button>
-            </form>
+            {passwordStep === 'form' ? (
+              <form onSubmit={handleRequestPasswordChange} className="space-y-4 max-w-lg">
+                <Input label="Current Password" type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} placeholder="••••••••" required />
+                <Button type="submit" isLoading={passwordLoading}>Continue</Button>
+              </form>
+            ) : (
+              <form onSubmit={handleConfirmPasswordChange} className="space-y-4 max-w-lg">
+                <Input
+                  label="Verification Code"
+                  type="text"
+                  value={passwordOtpCode}
+                  onChange={(e) => setPasswordOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="Enter 6-digit code"
+                  maxLength={6}
+                />
+                <Input label="New Password" type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} placeholder="Min 8 chars, upper + lower + number" required />
+                <Input label="Confirm New Password" type="password" value={confirmNewPassword} onChange={(e) => setConfirmNewPassword(e.target.value)} placeholder="••••••••" required />
+                <div className="flex gap-3">
+                  <Button type="submit" isLoading={passwordLoading}>Update Password</Button>
+                  <Button type="button" variant="secondary" onClick={() => { setPasswordStep('form'); setPasswordOtpCode(''); setNewPassword(''); setConfirmNewPassword(''); }}>Cancel</Button>
+                </div>
+              </form>
+            )}
           </Card>
           <Card>
             <h3 className="font-heading text-lg font-semibold text-ink-900 mb-4">Change Email</h3>
             <p className="text-sm text-ink-500 mb-4">Current email: <span className="font-medium text-ink-700">{user?.email}</span></p>
-            <form onSubmit={handleChangeEmail} className="space-y-4 max-w-lg">
-              <Input label="New Email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="new@example.com" required />
-              <Input label="Password" type="password" value={emailPassword} onChange={(e) => setEmailPassword(e.target.value)} placeholder="Enter your password to confirm" required />
-              <Button type="submit" isLoading={emailLoading}>Change Email</Button>
-            </form>
+            {emailStep === 'form' ? (
+              <form onSubmit={handleRequestEmailChange} className="space-y-4 max-w-lg">
+                <Input label="New Email" type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} placeholder="new@example.com" required />
+                <Input label="Password" type="password" value={emailPassword} onChange={(e) => setEmailPassword(e.target.value)} placeholder="Enter your password to confirm" required />
+                <Button type="submit" isLoading={emailLoading}>Change Email</Button>
+              </form>
+            ) : (
+              <form onSubmit={handleConfirmEmailChange} className="space-y-4 max-w-lg">
+                <p className="text-sm text-ink-600 mb-2">A verification code has been sent to <span className="font-medium">{newEmail}</span>.</p>
+                <Input
+                  label="Verification Code"
+                  type="text"
+                  value={emailOtpCode}
+                  onChange={(e) => setEmailOtpCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                  placeholder="Enter 6-digit code"
+                  maxLength={6}
+                  autoFocus
+                />
+                <div className="flex gap-3">
+                  <Button type="submit" isLoading={emailLoading}>Verify & Change Email</Button>
+                  <Button type="button" variant="secondary" onClick={() => { setEmailStep('form'); setEmailOtpCode(''); }}>Cancel</Button>
+                </div>
+              </form>
+            )}
           </Card>
         </div>
       )}

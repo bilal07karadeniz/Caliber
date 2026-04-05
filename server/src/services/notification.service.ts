@@ -98,6 +98,12 @@ export const notificationService = {
     );
   },
 
+  async sendOTPEmail(email: string, name: string, code: string, purpose: string) {
+    await sendEmail(email, `Your verification code — Caliber`,
+      `<h2>Hi ${name},</h2><p>Your verification code for ${purpose}:</p><h1 style="font-size:36px;letter-spacing:8px;text-align:center;padding:20px;background:#f5f5f5;border-radius:8px;font-family:monospace">${code}</h1><p>This code expires in 10 minutes.</p><p>If you didn't request this, ignore this email.</p>`
+    );
+  },
+
   isEmailEnabled(): boolean {
     return !!resend;
   },

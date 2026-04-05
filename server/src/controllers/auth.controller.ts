@@ -4,7 +4,7 @@ import { hashPassword, comparePassword } from '../utils/password';
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from '../utils/jwt';
 import { AuthenticatedRequest } from '../types';
 import { sanitizeUser } from '../utils/sanitizeUser';
-import { generateToken, hashToken } from '../utils/verificationToken';
+import { generateToken, hashToken, generateOTP } from '../utils/verificationToken';
 import { notificationService } from '../services/notification.service';
 import { config } from '../config';
 
@@ -85,6 +85,24 @@ export const login = async (req: Request, res: Response) => {
       return res.status(403).json({ success: false, message: 'Please verify your email before logging in', emailVerified: false });
     }
 
+    if (notificationService.isEmailEnabled()) {
+      await prisma.verificationToken.deleteMany({
+        where: { userId: user.id, type: 'EMAIL_VERIFICATION', data: { path: ['purpose'], equals: 'login' } },
+      });
+      const code = generateOTP();
+      await prisma.verificationToken.create({
+        data: {
+          userId: user.id,
+          token: hashToken(code),
+          type: 'EMAIL_VERIFICATION',
+          expiresAt: new Date(Date.now() + config.otpExpiry),
+          data: { purpose: 'login' },
+        },
+      });
+      await notificationService.sendOTPEmail(user.email, user.name, code, 'login');
+      return res.json({ success: true, message: 'Verification code sent to your email', requiresOTP: true, userId: user.id });
+    }
+
     const accessToken = generateAccessToken({ userId: user.id, role: user.role });
     const refreshToken = generateRefreshToken({ userId: user.id });
 
@@ -102,6 +120,49 @@ export const login = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ success: false, message: 'Login failed' });
+  }
+};
+
+export const verifyLoginOTP = async (req: Request, res: Response) => {
+  try {
+    const { userId, code } = req.body;
+    const hashedCode = hashToken(code);
+
+    const token = await prisma.verificationToken.findFirst({
+      where: { userId, token: hashedCode, type: 'EMAIL_VERIFICATION', expiresAt: { gt: new Date() } },
+    });
+
+    if (!token || !(token.data as any)?.purpose) {
+      return res.status(400).json({ success: false, message: 'Invalid or expired code' });
+    }
+
+    const purpose = (token.data as any).purpose;
+    await prisma.verificationToken.delete({ where: { id: token.id } });
+
+    if (purpose === 'login') {
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        include: { userSkills: { include: { skill: true } }, companyProfile: true },
+      });
+      if (!user) return res.status(404).json({ success: false, message: 'User not found' });
+
+      const accessToken = generateAccessToken({ userId: user.id, role: user.role as any });
+      const refreshToken = generateRefreshToken({ userId: user.id });
+
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      });
+
+      const { password: _, ...userWithoutPassword } = user;
+      return res.json({ success: true, data: { user: userWithoutPassword, accessToken } });
+    }
+
+    return res.json({ success: true, message: 'Code verified' });
+  } catch (error) {
+    return res.status(500).json({ success: false, message: 'Verification failed' });
   }
 };
 

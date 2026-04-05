@@ -17,4 +17,5 @@ export const config = {
   redisUrl: process.env.REDIS_URL || '',
   verificationTokenExpiry: 24 * 60 * 60 * 1000, // 24 hours
   passwordResetTokenExpiry: 60 * 60 * 1000, // 1 hour
+  otpExpiry: 10 * 60 * 1000, // 10 minutes
 };
