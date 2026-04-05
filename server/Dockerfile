@@ -14,10 +14,7 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
-
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
-RUN mkdir -p /app/uploads/avatars /app/uploads/resumes && chown -R appuser:appgroup /app
-USER appuser
+RUN mkdir -p /app/uploads/avatars /app/uploads/resumes
 
 EXPOSE 3001
 CMD ["node", "dist/index.js"]
