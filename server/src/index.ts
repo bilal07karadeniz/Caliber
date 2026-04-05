@@ -12,6 +12,9 @@ import { setupSwagger } from './config/swagger';
 
 const app = express();
 
+// Trust proxy (Railway runs behind a reverse proxy)
+app.set('trust proxy', 1);
+
 // Middleware
 const allowedOrigins = (config.clientUrl || '').split(',').map(s => s.trim()).filter(Boolean);
 app.use(cors({

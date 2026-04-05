@@ -4,7 +4,11 @@ import fs from 'fs';
 import { config } from './index';
 
 const ensureDir = (dir: string) => {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  try {
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+  } catch (err) {
+    console.error(`Warning: Could not create directory ${dir}:`, err);
+  }
 };
 
 const avatarStorage = multer.diskStorage({
