@@ -1,27 +1,32 @@
 import os
-from fastapi import APIRouter, Depends, HTTPException
+import tempfile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, File
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
-from app.core.config import settings
-from app.schemas.resume import ResumeParseRequest, ResumeParseResponse, ParsedResumeData
+from app.schemas.resume import ResumeParseResponse, ParsedResumeData
 from app.services.resume_parser import resume_parser
 
 router = APIRouter()
 
-UPLOADS_DIR = os.path.realpath(settings.UPLOADS_DIR)
-
 
 @router.post("/parse-resume", response_model=ResumeParseResponse)
-async def parse_resume(request: ResumeParseRequest, db: AsyncSession = Depends(get_db)):
-    # Fix 2: Path traversal validation
-    real_path = os.path.realpath(request.file_path)
-    if not real_path.startswith(UPLOADS_DIR):
-        raise HTTPException(status_code=400, detail="File path is outside the allowed uploads directory")
+async def parse_resume(file: UploadFile = File(...), db: AsyncSession = Depends(get_db)):
+    # Save uploaded file to temp directory
+    suffix = os.path.splitext(file.filename or ".pdf")[1]
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        content = await file.read()
+        tmp.write(content)
+        tmp_path = tmp.name
 
-    raw_text = resume_parser.parse_file(real_path)
-    structured = resume_parser.extract_structured_data(raw_text)
+    try:
+        raw_text = resume_parser.parse_file(tmp_path)
+        structured = resume_parser.extract_structured_data(raw_text)
 
-    return ResumeParseResponse(
-        extracted_text=raw_text[:50000],
-        parsed_data=ParsedResumeData(**structured),
-    )
+        return ResumeParseResponse(
+            extracted_text=raw_text[:50000],
+            parsed_data=ParsedResumeData(**structured),
+        )
+    finally:
+        # Clean up temp file
+        if os.path.exists(tmp_path):
+            os.unlink(tmp_path)

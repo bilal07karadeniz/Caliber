@@ -2,10 +2,6 @@ from pydantic import BaseModel
 from typing import Optional
 
 
-class ResumeParseRequest(BaseModel):
-    file_path: str
-
-
 class Education(BaseModel):
     institution: str = ""
     degree: str = ""

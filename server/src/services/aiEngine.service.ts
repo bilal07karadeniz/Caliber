@@ -1,4 +1,7 @@
 import axios from 'axios';
+import fs from 'fs';
+import path from 'path';
+import FormData from 'form-data';
 import { config } from '../config';
 
 const aiClient = axios.create({
@@ -10,7 +13,12 @@ const aiClient = axios.create({
 export const aiEngineService = {
   async parseResume(filePath: string) {
     try {
-      const { data } = await aiClient.post('/api/parse-resume', { file_path: filePath });
+      const form = new FormData();
+      form.append('file', fs.createReadStream(filePath), path.basename(filePath));
+      const { data } = await aiClient.post('/api/parse-resume', form, {
+        headers: { ...form.getHeaders(), ...(config.aiApiKey ? { 'X-API-Key': config.aiApiKey } : {}) },
+        timeout: 60000,
+      });
       return data;
     } catch (error) {
       console.error('AI Engine parse error:', error);
