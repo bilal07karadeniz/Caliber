@@ -14,8 +14,6 @@ COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/prisma ./prisma
-COPY --from=builder /app/start.sh ./start.sh
-RUN chmod +x start.sh
 RUN mkdir -p uploads/avatars uploads/resumes
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
@@ -23,4 +21,4 @@ RUN chown -R appuser:appgroup /app
 USER appuser
 
 EXPOSE 3001
-CMD ["./start.sh"]
+CMD ["node", "dist/index.js"]
