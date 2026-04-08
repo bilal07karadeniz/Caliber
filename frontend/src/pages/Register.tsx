@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -21,11 +21,14 @@ type FormData = z.infer<typeof schema>;
 
 export default function Register() {
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const { register: registerUser } = useAuthStore();
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors } } = useForm<FormData>({ resolver: zodResolver(schema), defaultValues: { role: 'JOB_SEEKER' } });
 
   const onSubmit = async (data: FormData) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     try {
       await registerUser(data.name, data.email, data.password, data.role);
@@ -39,7 +42,7 @@ export default function Register() {
       }
     }
     catch (err: any) { toast.error(err.response?.data?.message || 'Registration failed'); }
-    finally { setLoading(false); }
+    finally { setLoading(false); submittingRef.current = false; }
   };
 
   return (

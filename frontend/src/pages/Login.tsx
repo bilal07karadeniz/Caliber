@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,6 +19,7 @@ type FormData = z.infer<typeof schema>;
 
 export default function Login() {
   const [loading, setLoading] = useState(false);
+  const submittingRef = useRef(false);
   const { setUser } = useAuthStore();
   const navigate = useNavigate();
   const { register, handleSubmit, formState: { errors }, getValues } = useForm<FormData>({ resolver: zodResolver(schema) });
@@ -33,6 +34,8 @@ export default function Login() {
   const [otpLoading, setOtpLoading] = useState(false);
 
   const onSubmit = async (data: FormData) => {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     setLoading(true);
     try {
       const { data: res } = await authApi.login({ email: data.email, password: data.password });
@@ -55,6 +58,7 @@ export default function Login() {
       }
     } finally {
       setLoading(false);
+      submittingRef.current = false;
     }
   };
 
