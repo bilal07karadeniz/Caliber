@@ -41,7 +41,7 @@ export default function JobDetail() {
           <div className="flex flex-col md:flex-row justify-between gap-4 mb-4">
             <div>
               <h1 className="font-heading text-2xl font-bold text-ink-900">{job.title}</h1>
-              <p className="text-ink-500">{job.employer?.companyProfile?.companyName || 'Company'}</p>
+              <p className="text-ink-500">{job.employer?.companyProfile?.companyName || job.employer?.name || 'Company'}</p>
             </div>
             <div className="flex gap-2">
               {isAuthenticated && user?.role === 'JOB_SEEKER' && (
@@ -94,7 +94,7 @@ export default function JobDetail() {
           <div>
             <Card header={<h3 className="font-heading font-semibold text-ink-900">Company Info</h3>}>
               <div className="space-y-3 text-sm">
-                <p><span className="text-ink-500">Company:</span> {job.employer?.companyProfile?.companyName}</p>
+                <p><span className="text-ink-500">Company:</span> {job.employer?.companyProfile?.companyName || job.employer?.name || 'Company'}</p>
                 {job.employer?.companyProfile?.industry && <p><span className="text-ink-500">Industry:</span> {job.employer.companyProfile.industry}</p>}
                 {job.employer?.companyProfile?.size && <p><span className="text-ink-500">Size:</span> {job.employer.companyProfile.size}</p>}
                 {job.employer?.companyProfile?.website && (

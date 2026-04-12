@@ -13,7 +13,7 @@ export default function JobCard({ job }: { job: Job }) {
       <div className="flex justify-between items-start mb-2">
         <div>
           <h3 className="font-heading font-semibold text-ink-900">{job.title}</h3>
-          <p className="text-sm text-ink-500">{job.employer?.companyProfile?.companyName || 'Company'}</p>
+          <p className="text-sm text-ink-500">{job.employer?.companyProfile?.companyName || job.employer?.name || 'Company'}</p>
         </div>
         <Badge>{typeLabels[job.employmentType] || job.employmentType}</Badge>
       </div>

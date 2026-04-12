@@ -4,7 +4,7 @@ import { AuthenticatedRequest } from '../types';
 
 export const createJob = async (req: AuthenticatedRequest, res: Response) => {
   try {
-    const { title, description, requirements, location, salaryMin, salaryMax, employmentType, skills } = req.body;
+    const { title, description, requirements, location, salaryMin, salaryMax, employmentType, category, skills } = req.body;
 
     const job = await prisma.$transaction(async (tx) => {
       const newJob = await tx.job.create({
@@ -17,6 +17,7 @@ export const createJob = async (req: AuthenticatedRequest, res: Response) => {
           salaryMin,
           salaryMax,
           employmentType,
+          category: category || undefined,
         },
       });
 
@@ -54,7 +55,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
       return res.status(403).json({ success: false, message: 'Not your job posting' });
     }
 
-    const { title, description, requirements, location, salaryMin, salaryMax, employmentType, skills } = req.body;
+    const { title, description, requirements, location, salaryMin, salaryMax, employmentType, category, skills } = req.body;
 
     const updated = await prisma.$transaction(async (tx) => {
       await tx.job.update({
@@ -67,6 +68,7 @@ export const updateJob = async (req: AuthenticatedRequest, res: Response) => {
           ...(salaryMin !== undefined && { salaryMin }),
           ...(salaryMax !== undefined && { salaryMax }),
           ...(employmentType && { employmentType }),
+          ...(category !== undefined && { category: category || null }),
         },
       });
 
@@ -154,8 +156,11 @@ export const getAllJobs = async (req: Request, res: Response) => {
         { description: { contains: search, mode: 'insensitive' } },
       ];
     }
+    const category = req.query.category as string;
+
     if (location) where.location = { contains: location, mode: 'insensitive' };
     if (employmentType) where.employmentType = employmentType;
+    if (category) where.category = category;
     if (salaryMin) where.salaryMax = { gte: salaryMin };
     if (salaryMax) where.salaryMin = { lte: salaryMax };
     if (skillsFilter) {

@@ -16,6 +16,7 @@ class Job(Base):
     salaryMin = Column("salaryMin", Integer, nullable=True)
     salaryMax = Column("salaryMax", Integer, nullable=True)
     employmentType = Column("employmentType", String, nullable=False)
+    category = Column(String, nullable=True)
     isActive = Column("isActive", Boolean, default=True)
     createdAt = Column("createdAt", DateTime, server_default=func.now())
     updatedAt = Column("updatedAt", DateTime, onupdate=func.now())

@@ -15,6 +15,7 @@ export default function JobList() {
   const [search, setSearch] = useState('');
   const [location, setLocation] = useState('');
   const [employmentType, setEmploymentType] = useState('');
+  const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [sortBy, setSortBy] = useState('createdAt');
@@ -22,13 +23,13 @@ export default function JobList() {
   useEffect(() => {
     const timer = setTimeout(loadJobs, 300);
     return () => clearTimeout(timer);
-  }, [search, location, employmentType, page, sortBy]);
+  }, [search, location, employmentType, category, page, sortBy]);
 
   const loadJobs = async () => {
     setLoading(true);
     try {
       const { data: res } = await jobApi.getAll({
-        search, location, employmentType: employmentType || undefined,
+        search, location, employmentType: employmentType || undefined, category: category || undefined,
         page, limit: 12, sortBy, sortOrder: 'desc',
       });
       setJobs(res.data?.data || []);
@@ -43,7 +44,7 @@ export default function JobList() {
         <h1 className="font-heading text-3xl font-bold text-ink-900 mb-6">Find Jobs</h1>
 
         <div className="bg-surface-raised border border-ink-200 rounded-md p-4 mb-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-2.5 w-4 h-4 text-ink-400" />
               <input className="w-full pl-9 pr-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none" placeholder="Search jobs..." value={search} onChange={(e) => { setSearch(e.target.value); setPage(1); }} />
@@ -51,6 +52,8 @@ export default function JobList() {
             <input className="w-full px-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none" placeholder="Location..." value={location} onChange={(e) => { setLocation(e.target.value); setPage(1); }} />
             <Select value={employmentType} onChange={(e) => { setEmploymentType(e.target.value); setPage(1); }}
               options={[{ value: '', label: 'All Types' }, { value: 'FULL_TIME', label: 'Full Time' }, { value: 'PART_TIME', label: 'Part Time' }, { value: 'CONTRACT', label: 'Contract' }, { value: 'INTERNSHIP', label: 'Internship' }, { value: 'REMOTE', label: 'Remote' }]} />
+            <Select value={category} onChange={(e) => { setCategory(e.target.value); setPage(1); }}
+              options={[{ value: '', label: 'All Categories' }, { value: 'Technology', label: 'Technology' }, { value: 'Healthcare', label: 'Healthcare' }, { value: 'Finance', label: 'Finance' }, { value: 'Education', label: 'Education' }, { value: 'Marketing', label: 'Marketing' }, { value: 'Legal', label: 'Legal' }, { value: 'Design', label: 'Design' }, { value: 'Engineering', label: 'Engineering' }, { value: 'Sales', label: 'Sales' }, { value: 'Human Resources', label: 'Human Resources' }, { value: 'Business', label: 'Business' }, { value: 'Manufacturing', label: 'Manufacturing' }, { value: 'Retail', label: 'Retail' }, { value: 'Hospitality', label: 'Hospitality' }, { value: 'Other', label: 'Other' }]} />
             <Select value={sortBy} onChange={(e) => setSortBy(e.target.value)}
               options={[{ value: 'createdAt', label: 'Most Recent' }, { value: 'salaryMax', label: 'Highest Salary' }, { value: 'title', label: 'Title' }]} />
           </div>

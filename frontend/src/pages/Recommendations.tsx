@@ -29,13 +29,20 @@ export default function Recommendations() {
   const [recs, setRecs] = useState<AiRecommendation[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [profileIncomplete, setProfileIncomplete] = useState(false);
 
   useEffect(() => { loadRecs(); }, []);
 
   const loadRecs = async () => {
     try {
       const { data: res } = await recommendationApi.getMy();
-      setRecs(res.data || []);
+      if (res.message === 'PROFILE_INCOMPLETE') {
+        setProfileIncomplete(true);
+        setRecs([]);
+      } else {
+        setProfileIncomplete(false);
+        setRecs(res.data || []);
+      }
     } catch (e) { console.error(e); }
     setLoading(false);
   };
@@ -61,7 +68,9 @@ export default function Recommendations() {
         </Button>
       </div>
 
-      {recs.length === 0 ? (
+      {profileIncomplete ? (
+        <EmptyState title="Complete your profile first" description="Add at least some skills or upload a resume to get personalized AI-powered job recommendations." action={<Link to="/profile"><Button>Go to Profile</Button></Link>} />
+      ) : recs.length === 0 ? (
         <EmptyState title="No recommendations yet" description="Upload a resume and add skills to get personalized job recommendations" action={<Link to="/profile"><Button>Complete Profile</Button></Link>} />
       ) : (
         <div className="space-y-4">
@@ -73,7 +82,7 @@ export default function Recommendations() {
                     <SignalBar score={rec.matchScore} />
                     <div>
                       <Link to={`/jobs/${rec.jobId}`} className="font-heading text-lg font-semibold text-ink-900 hover:text-verdant-600 transition-colors">{rec.job?.title || 'Job Position'}</Link>
-                      <p className="text-sm text-ink-500">{rec.job?.employer?.companyProfile?.companyName} · {rec.job?.location}</p>
+                      <p className="text-sm text-ink-500">{rec.job?.employer?.companyProfile?.companyName || rec.job?.employer?.name || 'Company'} · {rec.job?.location}</p>
                       {rec.explanation && <p className="text-sm text-ink-600 mt-2 font-body">{rec.explanation}</p>}
                       {rec.skillGap && rec.skillGap.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-2">

@@ -61,6 +61,14 @@ export default function Dashboard() {
 
       {user?.role === 'JOB_SEEKER' && (
         <>
+          {/* Profile incomplete prompt */}
+          {!user?.userSkills?.length && (
+            <div className="mb-6 p-4 border border-saffron-300 bg-saffron-50 rounded-md">
+              <p className="text-sm text-saffron-800 font-medium">Add skills or upload a resume to unlock AI-powered job recommendations.</p>
+              <Link to="/profile" className="text-sm text-verdant-600 hover:underline underline-offset-4 mt-1 inline-block">Go to Profile</Link>
+            </div>
+          )}
+
           {/* Data wall stats */}
           <div className="border border-ink-200 rounded-md bg-surface-raised mb-8">
             <div className="data-wall">
@@ -89,7 +97,7 @@ export default function Dashboard() {
                 <div key={rec.id} className="flex items-center justify-between py-3 border-b border-ink-200 last:border-0">
                   <div>
                     <p className="font-medium text-sm text-ink-900">{rec.job?.title || 'Job'}</p>
-                    <p className="text-xs text-ink-500">{rec.job?.employer?.companyProfile?.companyName || ''}</p>
+                    <p className="text-xs text-ink-500">{rec.job?.employer?.companyProfile?.companyName || rec.job?.employer?.name || ''}</p>
                   </div>
                   <span className="font-mono tabular-nums text-sm font-medium">{Math.round(rec.matchScore)}%</span>
                 </div>

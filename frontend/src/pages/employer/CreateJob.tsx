@@ -8,23 +8,18 @@ import Input from '../../components/ui/Input';
 import TextArea from '../../components/ui/TextArea';
 import Select from '../../components/ui/Select';
 import Button from '../../components/ui/Button';
+import SkillAutocomplete from '../../components/SkillAutocomplete';
 import { jobApi } from '../../services/api';
+
+const JOB_CATEGORIES = ['Technology', 'Healthcare', 'Finance', 'Education', 'Marketing', 'Legal', 'Design', 'Engineering', 'Sales', 'Human Resources', 'Manufacturing', 'Retail', 'Hospitality', 'Other'];
 
 export default function CreateJob() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [skills, setSkills] = useState<{ name: string; requiredLevel: number }[]>([]);
-  const [skillName, setSkillName] = useState('');
   const [skillLevel, setSkillLevel] = useState(3);
 
   const { register, handleSubmit, formState: { errors } } = useForm();
-
-  const addSkill = () => {
-    if (skillName.trim() && !skills.find((s) => s.name.toLowerCase() === skillName.toLowerCase())) {
-      setSkills([...skills, { name: skillName.trim(), requiredLevel: skillLevel }]);
-      setSkillName('');
-    }
-  };
 
   const onSubmit = async (data: any) => {
     setLoading(true);
@@ -52,6 +47,8 @@ export default function CreateJob() {
                   <Select label="Employment Type" {...register('employmentType', { required: 'Required' })}
                     options={[{ value: 'FULL_TIME', label: 'Full Time' }, { value: 'PART_TIME', label: 'Part Time' }, { value: 'CONTRACT', label: 'Contract' }, { value: 'INTERNSHIP', label: 'Internship' }, { value: 'REMOTE', label: 'Remote' }]} />
                 </div>
+                <Select label="Category" {...register('category')}
+                  options={[{ value: '', label: 'Select Category' }, ...JOB_CATEGORIES.map((c) => ({ value: c, label: c }))]} />
                 <div className="grid grid-cols-2 gap-4">
                   <Input label="Min Salary (USD)" type="number" {...register('salaryMin')} placeholder="e.g. 50000" />
                   <Input label="Max Salary (USD)" type="number" {...register('salaryMax')} placeholder="e.g. 80000" />
@@ -69,14 +66,22 @@ export default function CreateJob() {
                 ))}
               </div>
               <div className="flex gap-2 items-end">
-                <Input label="Skill Name" value={skillName} onChange={(e) => setSkillName(e.target.value)} placeholder="e.g. React" />
+                <div className="flex-1">
+                  <p className="label mb-2">Skill Name</p>
+                  <SkillAutocomplete
+                    placeholder="Search skills..."
+                    excludeNames={skills.map((s) => s.name)}
+                    onSelect={(skill) => {
+                      setSkills([...skills, { name: skill.name, requiredLevel: skillLevel }]);
+                    }}
+                  />
+                </div>
                 <div>
                   <p className="label mb-1">Level</p>
                   <select value={skillLevel} onChange={(e) => setSkillLevel(Number(e.target.value))} className="px-3 py-2 border border-ink-200 rounded-md font-body text-sm transition-colors focus:border-verdant-500 focus:outline-none">
                     {[1, 2, 3, 4, 5].map((l) => <option key={l} value={l}>{l}</option>)}
                   </select>
                 </div>
-                <Button type="button" variant="secondary" onClick={addSkill}>Add</Button>
               </div>
             </Card>
           </div>

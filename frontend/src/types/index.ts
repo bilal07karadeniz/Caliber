@@ -25,6 +25,7 @@ export interface Job {
   salaryMin?: number;
   salaryMax?: number;
   employmentType: 'FULL_TIME' | 'PART_TIME' | 'CONTRACT' | 'INTERNSHIP' | 'REMOTE';
+  category?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

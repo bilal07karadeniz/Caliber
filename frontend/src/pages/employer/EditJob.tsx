@@ -9,7 +9,10 @@ import TextArea from '../../components/ui/TextArea';
 import Select from '../../components/ui/Select';
 import Button from '../../components/ui/Button';
 import Spinner from '../../components/ui/Spinner';
+import SkillAutocomplete from '../../components/SkillAutocomplete';
 import { jobApi } from '../../services/api';
+
+const JOB_CATEGORIES = ['Technology', 'Healthcare', 'Finance', 'Education', 'Marketing', 'Legal', 'Design', 'Engineering', 'Sales', 'Human Resources', 'Manufacturing', 'Retail', 'Hospitality', 'Other'];
 
 export default function EditJob() {
   const { id } = useParams();
@@ -17,7 +20,6 @@ export default function EditJob() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [skills, setSkills] = useState<{ name: string; requiredLevel: number }[]>([]);
-  const [skillName, setSkillName] = useState('');
   const [skillLevel, setSkillLevel] = useState(3);
   const { register, handleSubmit, reset } = useForm();
 
@@ -27,17 +29,10 @@ export default function EditJob() {
     try {
       const { data: res } = await jobApi.get(id!);
       const job = res.data;
-      reset({ title: job.title, description: job.description, requirements: job.requirements, location: job.location, employmentType: job.employmentType, salaryMin: job.salaryMin, salaryMax: job.salaryMax });
+      reset({ title: job.title, description: job.description, requirements: job.requirements, location: job.location, employmentType: job.employmentType, category: job.category || '', salaryMin: job.salaryMin, salaryMax: job.salaryMax });
       setSkills(job.jobSkills?.map((js: any) => ({ name: js.skill.name, requiredLevel: js.requiredLevel || 3 })) || []);
     } catch { toast.error('Failed to load job'); }
     setLoading(false);
-  };
-
-  const addSkill = () => {
-    if (skillName.trim() && !skills.find((s) => s.name.toLowerCase() === skillName.toLowerCase())) {
-      setSkills([...skills, { name: skillName.trim(), requiredLevel: skillLevel }]);
-      setSkillName('');
-    }
   };
 
   const onSubmit = async (data: any) => {
@@ -70,6 +65,8 @@ export default function EditJob() {
               <Input label="Min Salary" type="number" {...register('salaryMin')} />
               <Input label="Max Salary" type="number" {...register('salaryMax')} />
             </div>
+            <Select label="Category" {...register('category')}
+              options={[{ value: '', label: 'Select Category' }, ...JOB_CATEGORIES.map((c) => ({ value: c, label: c }))]} />
             <div>
               <p className="label mb-2">Skills</p>
               <div className="flex flex-wrap gap-2 mb-3">
@@ -80,10 +77,17 @@ export default function EditJob() {
                   </span>
                 ))}
               </div>
-              <div className="flex gap-2">
-                <input className="flex-1 px-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none" value={skillName} onChange={(e) => setSkillName(e.target.value)} placeholder="Skill name" />
+              <div className="flex gap-2 items-end">
+                <div className="flex-1">
+                  <SkillAutocomplete
+                    placeholder="Search skills..."
+                    excludeNames={skills.map((s) => s.name)}
+                    onSelect={(skill) => {
+                      setSkills([...skills, { name: skill.name, requiredLevel: skillLevel }]);
+                    }}
+                  />
+                </div>
                 <select value={skillLevel} onChange={(e) => setSkillLevel(Number(e.target.value))} className="px-3 py-2 border border-ink-200 rounded-md text-sm font-body transition-colors focus:border-verdant-500 focus:outline-none"><option value={1}>1</option><option value={2}>2</option><option value={3}>3</option><option value={4}>4</option><option value={5}>5</option></select>
-                <Button type="button" variant="secondary" size="sm" onClick={addSkill}>Add</Button>
               </div>
             </div>
             <Button type="submit" isLoading={saving}>Save Changes</Button>

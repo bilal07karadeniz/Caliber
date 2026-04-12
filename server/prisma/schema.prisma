@@ -80,6 +80,7 @@ model Job {
   salaryMin      Int?
   salaryMax      Int?
   employmentType EmploymentType
+  category       String?
   isActive       Boolean        @default(true)
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
@@ -92,6 +93,7 @@ model Job {
   @@index([employerId])
   @@index([isActive])
   @@index([employmentType])
+  @@index([category])
   @@index([location])
   @@map("jobs")
 }

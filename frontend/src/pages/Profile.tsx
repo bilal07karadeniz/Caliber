@@ -7,6 +7,7 @@ import Input from '../components/ui/Input';
 import TextArea from '../components/ui/TextArea';
 import Button from '../components/ui/Button';
 import Badge from '../components/ui/Badge';
+import SkillAutocomplete from '../components/SkillAutocomplete';
 import { useAuthStore } from '../store/authStore';
 import { userApi, companyApi, resumeApi } from '../services/api';
 
@@ -14,7 +15,6 @@ export default function Profile() {
   const { user, fetchMe } = useAuthStore();
   const [activeTab, setActiveTab] = useState('personal');
   const [skills, setSkills] = useState<{ skillName: string; proficiencyLevel: number }[]>([]);
-  const [newSkill, setNewSkill] = useState('');
   const [newLevel, setNewLevel] = useState(3);
   const [loading, setLoading] = useState(false);
   const [resumes, setResumes] = useState<any[]>([]);
@@ -72,13 +72,6 @@ export default function Profile() {
       toast.success('Skills updated');
     } catch { toast.error('Failed to update skills'); }
     setLoading(false);
-  };
-
-  const addSkill = () => {
-    if (newSkill.trim() && !skills.find((s) => s.skillName.toLowerCase() === newSkill.toLowerCase())) {
-      setSkills([...skills, { skillName: newSkill.trim(), proficiencyLevel: newLevel }]);
-      setNewSkill('');
-    }
   };
 
   const onSaveCompany = async (data: any) => {
@@ -164,8 +157,9 @@ export default function Profile() {
     setEmailLoading(false);
   };
 
-  const tabs = ['personal', 'skills', 'resumes', 'security'];
-  if (user?.role === 'EMPLOYER') tabs.splice(3, 0, 'company');
+  const tabs = user?.role === 'EMPLOYER'
+    ? ['personal', 'company', 'security']
+    : ['personal', 'skills', 'resumes', 'security'];
 
   return (
     <DashboardLayout>
@@ -205,14 +199,22 @@ export default function Profile() {
               ))}
             </div>
             <div className="flex gap-2 items-end">
-              <Input label="Add Skill" value={newSkill} onChange={(e) => setNewSkill(e.target.value)} placeholder="e.g. React" />
+              <div className="flex-1">
+                <p className="label mb-2">Add Skill</p>
+                <SkillAutocomplete
+                  placeholder="Search skills..."
+                  excludeNames={skills.map((s) => s.skillName)}
+                  onSelect={(skill) => {
+                    setSkills([...skills, { skillName: skill.name, proficiencyLevel: newLevel }]);
+                  }}
+                />
+              </div>
               <div>
                 <p className="label mb-1">Level</p>
                 <select value={newLevel} onChange={(e) => setNewLevel(Number(e.target.value))} className="px-3 py-2 border border-ink-200 rounded-md font-body text-sm transition-colors focus:border-verdant-500 focus:outline-none">
                   {[1, 2, 3, 4, 5].map((l) => <option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
-              <Button onClick={addSkill} variant="secondary">Add</Button>
             </div>
             <Button onClick={onSaveSkills} isLoading={loading}>Save Skills</Button>
           </div>

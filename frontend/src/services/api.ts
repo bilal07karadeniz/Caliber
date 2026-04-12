@@ -131,6 +131,13 @@ export const recommendationApi = {
   refresh: () => api.post('/recommendations/refresh'),
 };
 
+// Skills
+export const skillApi = {
+  search: (params?: { search?: string; category?: string; limit?: number }) =>
+    api.get('/skills', { params }),
+  getCategories: () => api.get('/skills/categories'),
+};
+
 // Skill Gap
 export const skillGapApi = {
   analyzeForJob: (jobId: string) => api.get(`/skill-gap/job/${jobId}`),

@@ -10,6 +10,7 @@ import skillgapRoutes from './skillgap.routes';
 import notificationRoutes from './notification.routes';
 import adminRoutes from './admin.routes';
 import privacyRoutes from './privacy.routes';
+import skillRoutes from './skill.routes';
 
 const router = Router();
 
@@ -17,6 +18,7 @@ router.use('/auth', authRoutes);
 router.use('/users', userRoutes);
 router.use('/companies', companyRoutes);
 router.use('/jobs', jobRoutes);
+router.use('/skills', skillRoutes);
 router.use('/resumes', resumeRoutes);
 router.use('/applications', applicationRoutes);
 router.use('/recommendations', recommendationRoutes);

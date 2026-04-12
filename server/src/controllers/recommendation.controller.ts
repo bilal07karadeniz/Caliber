@@ -5,6 +5,15 @@ import { aiEngineService } from '../services/aiEngine.service';
 
 export const getMyRecommendations = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    // Check profile completeness
+    const userProfile = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      include: { userSkills: true, resumes: { where: { isActive: true } } },
+    });
+    if (!userProfile?.userSkills?.length && !userProfile?.resumes?.length) {
+      return res.json({ success: true, data: [], message: 'PROFILE_INCOMPLETE' });
+    }
+
     // Try to get cached recommendations first (less than 1 hour old)
     const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000);
     let recommendations = await prisma.aiRecommendation.findMany({
@@ -76,6 +85,15 @@ export const getMatchDetail = async (req: AuthenticatedRequest, res: Response) =
 
 export const refreshRecommendations = async (req: AuthenticatedRequest, res: Response) => {
   try {
+    // Check profile completeness
+    const userProfile = await prisma.user.findUnique({
+      where: { id: req.user!.userId },
+      include: { userSkills: true, resumes: { where: { isActive: true } } },
+    });
+    if (!userProfile?.userSkills?.length && !userProfile?.resumes?.length) {
+      return res.json({ success: true, data: [], message: 'PROFILE_INCOMPLETE' });
+    }
+
     // Delete old recommendations
     await prisma.aiRecommendation.deleteMany({ where: { userId: req.user!.userId } });
     const result = await aiEngineService.getJobRecommendations(req.user!.userId);
