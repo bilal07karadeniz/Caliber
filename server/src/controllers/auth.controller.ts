@@ -179,7 +179,10 @@ export const refreshTokenHandler = async (req: Request, res: Response) => {
       return res.status(401).json({ success: false, message: 'Invalid refresh token' });
     }
 
-    const user = await prisma.user.findUnique({ where: { id: payload.userId } });
+    const user = await prisma.user.findUnique({
+      where: { id: payload.userId },
+      include: { userSkills: { include: { skill: true } }, companyProfile: true },
+    });
     if (!user || !user.isActive) {
       res.clearCookie('refreshToken');
       return res.status(401).json({ success: false, message: 'User not found or inactive' });
