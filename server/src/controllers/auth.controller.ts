@@ -69,12 +69,12 @@ export const login = async (req: Request, res: Response) => {
 
     const user = await prisma.user.findUnique({ where: { email } });
     if (!user) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Wrong email or password' });
     }
 
     const valid = await comparePassword(password, user.password);
     if (!valid) {
-      return res.status(401).json({ success: false, message: 'Invalid credentials' });
+      return res.status(401).json({ success: false, message: 'Wrong email or password' });
     }
 
     if (!user.isActive) {
