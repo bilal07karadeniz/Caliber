@@ -12,6 +12,20 @@ export const uploadResume = async (req: AuthenticatedRequest, res: Response) => 
       return res.status(400).json({ success: false, message: 'No file uploaded' });
     }
 
+    // Delete previous resumes (limit 1 per user)
+    const oldResumes = await prisma.resume.findMany({
+      where: { userId: req.user!.userId },
+    });
+    for (const old of oldResumes) {
+      const oldPath = path.resolve('.' + old.filePath);
+      if (fs.existsSync(oldPath)) {
+        try { fs.unlinkSync(oldPath); } catch {}
+      }
+    }
+    if (oldResumes.length > 0) {
+      await prisma.resume.deleteMany({ where: { userId: req.user!.userId } });
+    }
+
     const filePath = `/uploads/resumes/${req.file.filename}`;
     let resume = await prisma.resume.create({
       data: {
