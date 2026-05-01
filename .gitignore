@@ -24,3 +24,4 @@ coverage/
 sentence_transformers/
 .cache/
 huggingface/
+poster/
